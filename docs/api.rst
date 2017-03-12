@@ -12,6 +12,18 @@ The implementation status is indicated by the bullet:
 ✓ means the method is implemented,
 ✓✓ means the method is implemented and optimized.
 
+basic methods
+-------------
+
+✗ :py:`str(s)`:, :py:`format(s, format_spec)`:
+    - implemented by :py:`__str__` and :py:`__format__`
+    - the default inner and outer separators respectively are :py:`-` and
+      :py:` `
+    - the format spec is a string of length 2, where the inner (resp. outer)
+      separator is the first (resp. second) item
+    - :py:`format(s, '')` matches the behavior of :py:`str` as recommended in
+      the documentation
+
 
 container-like methods
 ----------------------
