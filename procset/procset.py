@@ -1,5 +1,50 @@
 # -*- coding: utf-8 -*-
 
+import operator
+
+
+class ProcInt(tuple):
+
+    __slots__ = ()
+
+    def __new__(cls, inf, sup):
+        """Create new instance of ProcInt(inf, sup)."""
+        if not isinstance(inf, int):
+            raise TypeError('{}() argument inf must be int'.format(cls.__name__))
+        if not isinstance(sup, int):
+            raise TypeError('{}() argument sup must be int'.format(cls.__name__))
+        if inf > sup:
+            raise ValueError('Invalid interval bounds')
+        if inf < 0:
+            raise ValueError('Invalid negative bound(s)')
+        return tuple.__new__(cls, (inf, sup))
+
+    def __repr__(self):
+        """Return a nicely formatted representation string."""
+        return '{}(inf={!r}, sup={!r})'.format(self.__class__.__name__, *self)
+
+    def __str__(self):
+        return format(self)
+
+    def __format__(self, format_spec):
+        if self.inf == self.sup:
+            return str(self.inf)
+        else:
+            if len(format_spec) > 1:
+                raise ValueError('Invalid format specifier')
+            insep = format_spec or '-'
+            return insep.join(map(str, self))
+
+    def __len__(self):
+        return self.sup - self.inf + 1
+
+    def __contains__(self, item):
+        return self.inf <= item <= self.sup
+
+    inf = property(operator.itemgetter(0), doc='Alias for field number 0')
+
+    sup = property(operator.itemgetter(1), doc='Alias for field number 1')
+
 
 class ProcSet:
 
