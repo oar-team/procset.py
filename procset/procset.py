@@ -48,10 +48,30 @@ class ProcInt(tuple):
 
 class ProcSet:
 
-    __slots__ = ()
+    __slots__ = '_itvs'
 
-    def __init__(self, it=None):
-        raise NotImplementedError
+    def __init__(self, *intervals):
+        """
+        Initialize a ProcSet.
+
+        A ProcSet can be intialized with either nothing (empty set), any number
+        of non-negative int, any number of ProcInt compatible objects (iterable
+        of 2 ints), or any combination of both.
+
+        There are no restrictions on the domains of the intervals in the
+        constructor: they may overlap.
+
+        Examples:
+            ProcSet()  # empty set
+            ProcSet(1)
+            ProcSet(ProcInt(0, 1))
+            ProcSet(ProcInt(0, 1), ProcInt(2, 3))
+            ProcSet((0, 1), [2, 3])  # identical to previous call
+            ProcSet(ProcInt(0, 1), *[0, 3])  # mixing ProcInt and lists
+        """
+        self._itvs = []  # list of disjoint intervals
+        for it in intervals:
+            self.add(it)
 
     @classmethod
     def from_str(cls, string, insep="-", outsep=" "):
@@ -59,23 +79,29 @@ class ProcSet:
 
     @classmethod
     def _from_iterable(cls, it):
-        """
-        Construct an instance of the class from any iterable input.
-        """
-        return cls(it)
+        """Construct an instance of the class from any iterable input."""
+        return cls(*it)
 
     def __str__(self):
-        """interval_set_to_string(intervals, separator=" ")"""
         return format(self)
 
     def __format__(self, format_spec):
-        raise NotImplementedError
+        if format_spec:
+            try:
+                insep, outsep = format_spec
+            except ValueError:
+                raise ValueError('Invalid format specifier') from None
+        else:
+            insep, outsep = '- '
 
-    def __repr__(self):
-        raise NotImplementedError
+        return outsep.join(format(itv, insep) for itv in self._itvs)
+
+    # def __repr__(self):
+    #     pass
 
     def __iter__(self):
-        raise NotImplementedError
+        for itv in self._itvs:
+            yield from range(itv.inf, itv.sup + 1)
 
     def __reversed__(self):
         raise NotImplementedError
@@ -85,11 +111,11 @@ class ProcSet:
 
     def __len__(self):
         """Return the number of processors."""
-        raise NotImplementedError
+        return sum(len(itv) for itv in self._itvs)
 
     def count(self):
         """Return the number of disjoint processors' intervals."""
-        raise NotImplementedError
+        return len(self._itvs)
 
     def iscontiguous(self):
         """Return True if the processors form a single contiguous set."""
@@ -125,7 +151,7 @@ class ProcSet:
     __ror__ = __or__
 
     def __eq__(self, other):
-        raise NotImplementedError
+        return self._itvs == other._itvs
 
     def intersection(self, *others):
         raise NotImplementedError
@@ -179,7 +205,33 @@ class ProcSet:
         raise NotImplementedError
 
     def add(self, elem):
-        raise NotImplementedError
+        """
+        Insert elem into self.
+
+        It is assumed elem is ProcInt compatible (iterable of 2 ints), or a
+        single int.
+        In the first case, ProcInt(*elem) is added into self, in the latter
+        ProcInt(elem, elem) is added.
+
+        If some processors already exist in self, they will not be added twice
+        (hey this is a set!).
+        """
+        try:
+            newinf, newsup = elem  # assume it is ProcInt compatible
+        except TypeError:
+            newinf, newsup = elem, elem  # if not assume it is a single point
+
+        for itv in list(self._itvs):
+            if newinf > itv.sup + 1:
+                continue
+            if newsup + 1 < itv.inf:
+                break
+            self._itvs.remove(itv)
+            newinf = min(newinf, itv.inf)
+            newsup = max(newsup, itv.sup)
+
+        self._itvs.append(ProcInt(newinf, newsup))
+        self._itvs.sort()
 
     def remove(self, elem):
         raise NotImplementedError
