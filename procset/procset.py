@@ -46,6 +46,26 @@ class ProcInt(tuple):
     sup = property(operator.itemgetter(1), doc='Alias for field number 1')
 
 
+class _Sentinel:
+    """Helper class whose instances are greater than any object."""
+
+    __slots__ = ()
+
+    def __eq__(self, other):
+        return self is other
+
+    def __lt__(self, other):
+        return False
+
+    __le__ = __eq__
+
+    def __gt__(self, other):
+        return True
+
+    def __ge__(self, other):
+        return True
+
+
 class ProcSet:
 
     __slots__ = '_itvs'
@@ -142,11 +162,78 @@ class ProcSet:
     def __gt__(self, other):
         raise NotImplementedError
 
+    def _flatten(self):
+        """Generate the (flat) list of interval bounds contained by self."""
+        for itv in self._itvs:
+            # use inf as is
+            yield False, itv.inf
+            # convert sup, as merging operations are made with half-open
+            # intervals
+            yield True, itv.sup + 1
+
+    @classmethod
+    def _merge_core(cls, leftset, rightset, keeppredicate):
+        """
+        Generate the (flat) list of interval bounds of the requested merge.
+        """
+        endbound = False
+        sentinel = _Sentinel()
+
+        lflat = leftset._flatten()
+        rflat = rightset._flatten()
+        lend, lhead = next(lflat, (False, sentinel))
+        rend, rhead = next(rflat, (False, sentinel))
+
+        head = min(lhead, rhead)
+        while head < sentinel:
+            inleft = (head < lhead) == lend
+            inright = (head < rhead) == rend
+            keep = keeppredicate(inleft, inright)
+
+            if keep ^ endbound:
+                endbound = not endbound
+                yield head
+            if head == lhead:
+                lend, lhead = next(lflat, (False, sentinel))
+            if head == rhead:
+                rend, rhead = next(rflat, (False, sentinel))
+
+            head = min(lhead, rhead)
+
+    @classmethod
+    def _merge(cls, leftset, rightset, keeppredicate):
+        """
+        Generate the ProcInt list of the requested merge.
+
+        The returned iterator is supposed to be assigned to the _itvs attribute
+        of the result ProcSet.
+        See the difference(), intersection(), symmetric_difference(), and
+        union() methods for an usage example.
+        """
+        flat_merge = cls._merge_core(leftset, rightset, keeppredicate)
+
+        # Note that we are feeding the same iterable twice to zip.
+        # The iterated bounds are hence grouped by pairs (lower and upper
+        # bounds of the intervals).
+        # As zip() stops on the shortest iterable, it won't consider the
+        # optional terminating sentinel (the sentinel would be the last
+        # element, and would have an odd index).
+        for inf, sup in zip(flat_merge, flat_merge):
+            yield ProcInt(inf, sup - 1)  # convert back to closed intervals
+
     def union(self, *others):
         raise NotImplementedError
 
     def __or__(self, other):
-        raise NotImplementedError
+        """Return a new ProcSet with the intervals from self and other."""
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+
+        # we do not use self._from_iterable as we know the result already is a
+        # valid _itvs list
+        result = ProcSet()
+        result._itvs = list(self._merge(self, other, operator.or_))
+        return result
 
     __ror__ = __or__
 
@@ -157,7 +244,15 @@ class ProcSet:
         raise NotImplementedError
 
     def __and__(self, other):
-        raise NotImplementedError
+        """Return a new ProcSet with the intervals common to self and other."""
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+
+        # we do not use self._from_iterable as we know the result already is a
+        # valid _itvs list
+        result = ProcSet()
+        result._itvs = list(self._merge(self, other, operator.and_))
+        return result
 
     __rand__ = __and__
 
@@ -165,7 +260,22 @@ class ProcSet:
         raise NotImplementedError
 
     def __sub__(self, other):
-        raise NotImplementedError
+        """
+        Return a new ProcSet with the intervals in self that are not in other.
+        """
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+
+        # we do not use self._from_iterable as we know the result already is a
+        # valid _itvs list
+        result = ProcSet()
+        result._itvs = list(
+            self._merge(
+                self, other,
+                lambda inleft, inright: inleft and not inright
+            )
+        )
+        return result
 
     __rsub__ = __sub__
 
@@ -173,7 +283,18 @@ class ProcSet:
         raise NotImplementedError
 
     def __xor__(self, other):
-        raise NotImplementedError
+        """
+        Return a new ProcSet with the intervals in either self or other but not
+        both.
+        """
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+
+        # we do not use self._from_iterable as we know the result already is a
+        # valid _itvs list
+        result = ProcSet()
+        result._itvs = list(self._merge(self, other, operator.xor))
+        return result
 
     __rxor__ = __xor__
 
