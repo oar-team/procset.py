@@ -179,6 +179,7 @@ class ProcSet:
         endbound = False
         sentinel = _Sentinel()
 
+        # pylint: disable=protected-access
         lflat = leftset._flatten()
         rflat = rightset._flatten()
         lend, lhead = next(lflat, (False, sentinel))
@@ -229,6 +230,7 @@ class ProcSet:
         if not isinstance(other, self.__class__):
             return NotImplemented
 
+        # pylint: disable=protected-access
         # we do not use self._from_iterable as we know the result already is a
         # valid _itvs list
         result = ProcSet()
@@ -238,6 +240,7 @@ class ProcSet:
     __ror__ = __or__
 
     def __eq__(self, other):
+        # pylint: disable=protected-access
         return self._itvs == other._itvs
 
     def intersection(self, *others):
@@ -248,6 +251,7 @@ class ProcSet:
         if not isinstance(other, self.__class__):
             return NotImplemented
 
+        # pylint: disable=protected-access
         # we do not use self._from_iterable as we know the result already is a
         # valid _itvs list
         result = ProcSet()
@@ -266,6 +270,7 @@ class ProcSet:
         if not isinstance(other, self.__class__):
             return NotImplemented
 
+        # pylint: disable=protected-access
         # we do not use self._from_iterable as we know the result already is a
         # valid _itvs list
         result = ProcSet()
@@ -290,6 +295,7 @@ class ProcSet:
         if not isinstance(other, self.__class__):
             return NotImplemented
 
+        # pylint: disable=protected-access
         # we do not use self._from_iterable as we know the result already is a
         # valid _itvs list
         result = ProcSet()

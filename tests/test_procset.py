@@ -4,6 +4,7 @@ import pytest
 from procset import ProcInt, ProcSet
 
 
+# pylint: disable=no-self-use,too-many-public-methods
 class TestNew:
     def test_empty(self):
         pset = ProcSet()
@@ -84,6 +85,7 @@ class TestNew:
             ProcSet(None)
 
 
+# pylint: disable=no-self-use,too-many-public-methods
 class TestMisc:
     def test_equal(self):
         pset1 = ProcSet(ProcInt(0, 0))
@@ -98,6 +100,7 @@ class TestMisc:
         assert pset1 != pset2
 
 
+# pylint: disable=no-self-use,too-many-public-methods
 class TestDisplay:
     def test_empty(self):
         pset = ProcSet()
@@ -136,6 +139,7 @@ class TestDisplay:
             format(ProcSet(), ':--')
 
 
+# pylint: disable=no-self-use,too-many-public-methods
 class TestAdd:
     def test_empty(self):
         """

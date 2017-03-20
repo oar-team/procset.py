@@ -4,6 +4,7 @@ import pytest
 from procset import ProcInt
 
 
+# pylint: disable=no-self-use,too-many-public-methods
 class TestNew:
     def test_point(self):
         itv = ProcInt(0, 0)
@@ -44,6 +45,7 @@ class TestNew:
             ProcInt(42, 1)
 
 
+# pylint: disable=no-self-use,too-many-public-methods
 class TestImmutability:
     def test_assign_inf(self):
         with pytest.raises(AttributeError):
@@ -56,6 +58,7 @@ class TestImmutability:
             itv.sup = 5
 
 
+# pylint: disable=no-self-use,too-many-public-methods
 class TestDisplay:
     def test_point(self):
         itv = ProcInt(0, 0)

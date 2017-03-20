@@ -9,6 +9,7 @@ from procset import ProcSet
 # See docs/NehmeierM2010Interval.pdf for further informations.
 
 
+# pylint: disable=no-self-use,too-many-public-methods
 class TestMergeDifference:
     def test_before_ii_notouch(self):
         """
@@ -557,6 +558,7 @@ class TestMergeDifference:
         assert list(pres) == []
 
 
+# pylint: disable=no-self-use,too-many-public-methods
 class TestMergeIntersection:
     def test_before_ii_notouch(self):
         """
@@ -1105,6 +1107,7 @@ class TestMergeIntersection:
         assert list(pres) == []
 
 
+# pylint: disable=no-self-use,too-many-public-methods
 class TestMergeSymmetricDifference:
     def test_before_ii_notouch(self):
         """
@@ -1653,6 +1656,7 @@ class TestMergeSymmetricDifference:
         assert list(pres) == []
 
 
+# pylint: disable=no-self-use,too-many-public-methods
 class TestMergeUnion:
     def test_before_ii_notouch(self):
         """
