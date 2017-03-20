@@ -95,7 +95,32 @@ class ProcSet:
 
     @classmethod
     def from_str(cls, string, insep="-", outsep=" "):
-        raise NotImplementedError
+        """Parse a string interval set representation into a ProcSet."""
+        if not isinstance(string, str):
+            raise TypeError(
+                'from_str() argument 2 must be str, not {}'.format(string.__class__.__name__)
+            )
+
+        new_pset = cls()
+
+        # empty string is parsed as empty ProcSet
+        if string == '':
+            return new_pset
+
+        try:
+            for itv in string.split(sep=outsep):
+                bounds = itv.split(sep=insep, maxsplit=1)
+                if len(bounds) == 1:
+                    new_pset.add(int(itv))
+                else:
+                    inf, sup = bounds
+                    new_pset.add(ProcInt(int(inf), int(sup)))
+        except ValueError:
+            raise ValueError(
+                'Invalid interval format, parsed string is: {}'.format(string)
+            ) from None
+
+        return new_pset
 
     @classmethod
     def _from_iterable(cls, it):

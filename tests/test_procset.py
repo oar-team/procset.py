@@ -101,6 +101,49 @@ class TestMisc:
 
 
 # pylint: disable=no-self-use,too-many-public-methods
+class TestStringParsing:
+    def test_empty(self):
+        pset = ProcSet.from_str('')
+        assert pset == ProcSet()
+
+    def test_single_point(self):
+        pset = ProcSet.from_str('0')
+        assert pset == ProcSet(0)
+
+    def test_contiguous(self):
+        pset = ProcSet.from_str('0-3')
+        assert pset == ProcSet(ProcInt(0, 3))
+
+    def test_disjoint_pp(self):
+        pset = ProcSet.from_str('1 2')
+        assert pset == ProcSet(1, 2)
+
+    def test_disjoint_ip(self):
+        pset = ProcSet.from_str('0-1 2')
+        assert pset == ProcSet(ProcInt(0, 1), 2)
+
+    def test_disjoint_ii(self):
+        pset = ProcSet.from_str('0-1 2-3')
+        assert pset == ProcSet(ProcInt(0, 3))
+
+    def test_nostring(self):
+        with pytest.raises(TypeError, message='from_str() argument 2 must be str, not int'):
+            ProcSet.from_str(42)
+
+    def test_missing_left(self):
+        with pytest.raises(ValueError, message='Invalid interval format, parsed string is: -1'):
+            ProcSet.from_str('-1')
+
+    def test_missing_right(self):
+        with pytest.raises(ValueError, message='Invalid interval format, parsed string is: 0-'):
+            ProcSet.from_str('0-')
+
+    def test_many_contig(self):
+        with pytest.raises(ValueError, message='Invalid interval format, parsed string is: 1-2-3'):
+            ProcSet.from_str('1-2-3')
+
+
+# pylint: disable=no-self-use,too-many-public-methods
 class TestDisplay:
     def test_empty(self):
         pset = ProcSet()
