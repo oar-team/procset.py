@@ -90,8 +90,8 @@ class ProcSet:
             ProcSet(ProcInt(0, 1), *[0, 3])  # mixing ProcInt and lists
         """
         self._itvs = []  # list of disjoint intervals
-        for it in intervals:
-            self.add(it)
+        for itv in intervals:
+            self.add(itv)
 
     @classmethod
     def from_str(cls, string, insep="-", outsep=" "):

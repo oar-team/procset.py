@@ -220,7 +220,6 @@ class TestAdd:
         assert pset.count() == 1
         assert list(pset) == [0, 1, 2, 3, 4, 5, 6, 7]
 
-
     def test_left_disjoint_notouch(self):
         """
         init:  -∞........[__]....+∞
