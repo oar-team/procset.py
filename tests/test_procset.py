@@ -99,6 +99,26 @@ class TestMisc:
         assert id(pset1) != id(pset2)
         assert pset1 != pset2
 
+    def test_aggregate_empy(self):
+        pset = ProcSet()
+        hull = ProcSet()
+        assert pset.aggregate() == hull
+
+    def test_aggregate_point(self):
+        pset = ProcSet(0)
+        hull = ProcSet(0)
+        assert pset.aggregate() == hull
+
+    def test_aggregate_single_interval(self):
+        pset = ProcSet((0, 7))
+        hull = ProcSet((0, 7))
+        assert pset.aggregate() == hull
+
+    def test_aggregate_many_interval(self):
+        pset = ProcSet((0, 1), (3, 4), (6, 7))
+        hull = ProcSet((0, 7))
+        assert pset.aggregate() == hull
+
 
 # pylint: disable=no-self-use,too-many-public-methods
 class TestStringParsing:

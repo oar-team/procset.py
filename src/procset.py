@@ -406,4 +406,15 @@ class ProcSet:
         raise NotImplementedError
 
     def aggregate(self):
-        raise NotImplementedError
+        """
+        Return the ProcSet that is the convex hull of self.
+
+        If self is empty, its convex hull is the empty ProcSet.
+        If self is not empty, its convex hull is the ProcSet with the smallest
+        interval containing all intervals from self.
+        """
+        if self._itvs:
+            inf, sup = self._itvs[0].inf, self._itvs[-1].sup
+            return ProcSet(ProcInt(inf, sup))
+        else:
+            return ProcSet()
