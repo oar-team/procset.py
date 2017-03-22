@@ -16,10 +16,19 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Toolkit to manage sets of closed intervals.
+
+This implementation requires intervals bounds to be non-negative integers. This
+design choice has been made as procset targets managment of resources for
+scheduling. Hence, the manipulated intervals can be represented as indexes.
+"""
+
 import operator
 
 
 class ProcInt(tuple):
+    """A ProcInt is a closed interval of non-negative integers."""
 
     __slots__ = ()
 
@@ -83,6 +92,12 @@ class _Sentinel:
 
 
 class ProcSet:
+    """
+    A ProcSet is a set of non-overlapping ProcInt.
+
+    The current implementation uses a sorted list of ProcSet to store the
+    ProcInt.
+    """
 
     __slots__ = '_itvs'
 
