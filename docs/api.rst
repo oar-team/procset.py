@@ -5,199 +5,241 @@
 API description
 ===============
 
-This document describes the API for the ProcSet.
+This document describes the API for the :py:`ProcSet` class.
 
 The implementation status is indicated by the bullet:
-✗ means the method is not yet implemented,
-✓ means the method is implemented,
-✓✓ means the method is implemented and optimized.
-
-basic methods
--------------
-
-✗ :py:`str(s)`:, :py:`format(s, format_spec)`:
-    - implemented by :py:`__str__` and :py:`__format__`
-    - the default inner and outer separators respectively are :py:`-` and
-      :py:` `
-    - the format spec is a string of length 2, where the inner (resp. outer)
-      separator is the first (resp. second) item
-    - :py:`format(s, '')` matches the behavior of :py:`str` as recommended in
-      the documentation
+  - ✗ means the method is not yet implemented,
+  - ✓ means the method is implemented,
+  - ✓✓ means the method is implemented and optimized.
 
 
-container-like methods
-----------------------
+Basic operations
+----------------
 
-✗ :py:`len(s)`:
-    implemented by :py:`__len__`
++--------+------------------------------+--------------------------------------+
+| status | operation                    | comment                              |
++========+==============================+======================================+
+| ✓      | :py:`str(s)`                 | implemented by :py:`__str__`         |
++--------+------------------------------+--------------------------------------+
+| ✓      | :py:`format(s, format_spec)` | - implemented by :py:`__format__`    |
+|        |                              | - the defaults separators are:       |
+|        |                              |     - inner :py:`-`                  |
+|        |                              |     - outer :py:` `                  |
+|        |                              | - the :py:`format_spec` is a string  |
+|        |                              |   of length 2, where the inner       |
+|        |                              |   (resp. outer) separator is the     |
+|        |                              |   first (resp. second) item          |
+|        |                              | - :py:`format(s, '')` matches the    |
+|        |                              |   behavior of :py:`str` as           |
+|        |                              |   recommended in the documentation   |
++--------+------------------------------+--------------------------------------+
 
-✗ :py:`x in s`, :py:`x not in s`:
-    implemented by :py:`__contains__`
 
-✗ iterator operations:
-    implemented by :py:`__iter__`, :py:`__reversed__`
+Container-like operations
+-------------------------
 
 https://docs.python.org/3/reference/datamodel.html#emulating-container-types
 
++--------+-------------------------------+-------------------------------------+
+| status | operation                     | comment                             |
++========+===============================+=====================================+
+| ✓      | :py:`len(s)`                  | implemented by :py:`__len__`        |
++--------+-------------------------------+-------------------------------------+
+| ✗      | :py:`x in s`                  | implemented by :py:`__contains__`   |
++--------+-------------------------------+                                     |
+| ✗      | :py:`x not in s`              |                                     |
++--------+-------------------------------+-------------------------------------+
+| ✓      | :py:`iter(s)`                 | implemented by :py:`__iter__`       |
++--------+-------------------------------+-------------------------------------+
+| ✗      | :py:`reversed(s)`             | implemented by :py:`__reversed__`   |
++--------+-------------------------------+-------------------------------------+
 
-sequence-like methods
----------------------
 
-✗ :py:`[i]`:
-    implemented with :py:`__getitem__` called with an :py:`int`
-
-✗ :py:`[i:j]`, :py:`[i:j:k]`:
-    implemented with :py:`__getitem__` called with an :py:`slice`
-
-✗ :py:`del s[i]`:
-    implemented with :py:`__delitem__`
-
-✗ :py:`min`, :py:`max`:
-    provide fast method
+Sequence-like operations
+------------------------
 
 https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range
 
++--------+-------------------------------+-------------------------------------+
+| status | operation                     | comment                             |
++========+===============================+=====================================+
+| ✗      | :py:`[i]`                     | implemented with :py:`__getitem__`, |
+|        |                               | called with an :py:`int`            |
++--------+-------------------------------+-------------------------------------+
+| ✗      | :py:`[i:j]`                   | implemented with :py:`__getitem__`, |
+|        |                               | called with a :py:`slice`           |
++--------+-------------------------------+                                     |
+| ✗      | :py:`[i:j:k]`                 |                                     |
++--------+-------------------------------+-------------------------------------+
+| ✗      | :py:`del s[i]`                | implemented with :py:`__delitem__`  |
++--------+-------------------------------+-------------------------------------+
+| ✗      | :py:`min(s)`                  | provide fast operations             |
++--------+-------------------------------+                                     |
+| ✗      | :py:`max(s)`                  |                                     |
++--------+-------------------------------+-------------------------------------+
 
-set-like methods
-----------------
 
-- immutable operations:
-    ✗ :py:`isdisjoint(other)`
-
-    ✗ :py:`issubset(other)`, :py:`<= other`:
-        implemented by :py:`__le__`
-
-    ✗ :py:`< other`:
-        implemented by :py:`__lt__`
-
-    ✗ :py:`issuperset(other)`, :py:`>= other`:
-        implemented by :py:`__ge__`
-
-    ✗ :py:`> other`:
-        implemented by :py:`__gt__`
-
-    ✗ :py:`== other`:
-        implemented by :py:`__eq__`
-
-    ✗ :py:`union(*others)`, :py:`| other | …`:
-        implemented by :py:`__or__`, check :py:`__ror__`
-
-    ✗ :py:`intersection(*others)`, :py:`& other & …`:
-        implemented by :py:`__and__`, check :py:`__rand__`
-
-    ✗ :py:`difference(*others)`, :py:`- other - …`:
-        implemented by :py:`__sub__`, check :py:`__rsub__`
-
-    ✗ `symmetric_difference(other)`, :py:`^ other`:
-        implemented by :py:`__xor__`
-
-    ✗ :py:`copy()`
-
-- mutable operations:
-    ✗ :py:`update(*others)`, :py:`|= other | …`:
-        implemented by :py:`__ior__`
-
-    ✗ :py:`intersection_update(*others)`, :py:`&= other & …`:
-        implemented by :py:`__iand__`
-
-    ✗ :py:`difference_update(*others)`, :py:`-= other | …`:
-        implemented by :py:`__isub__`
-
-    ✗ `symmetric_difference_update(other)`, :py:`^= other`:
-        implemented by :py:`__ixor__`
-
-    ✗ :py:`add(elem)`
-
-    ✗ :py:`remove(elem)`
-
-    ✗ :py:`discard(elem)`
-
-    ✗ :py:`pop()`
-
-    ✗ :py:`clear()`
+Set-like operations
+-------------------
 
 https://docs.python.org/3/library/stdtypes.html#set-types-set-frozenset
 
+Immutable sets operations
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-custom methods
---------------
++--------+------------------------------------------+-------------------------------------+
+| status | operation                                | comment                             |
++========+==========================================+=====================================+
+| ✗      | :py:`isdisjoint(other)`                  |                                     |
++--------+------------------------------------------+-------------------------------------+
+| ✗      | :py:`issubset(other)`                    | implemented by :py:`__le__`         |
++--------+------------------------------------------+                                     |
+| ✗      | :py:`<= other`                           |                                     |
++--------+------------------------------------------+-------------------------------------+
+| ✗      | :py:`< other`                            | implemented by :py:`__lt__`         |
++--------+------------------------------------------+-------------------------------------+
+| ✗      | :py:`issuperset(other)`                  | implemented by :py:`__ge__`         |
++--------+------------------------------------------+                                     |
+| ✗      | :py:`>= other`                           |                                     |
++--------+------------------------------------------+-------------------------------------+
+| ✗      | :py:`> other`                            | implemented by :py:`__gt__`         |
++--------+------------------------------------------+-------------------------------------+
+| ✓      | :py:`== other`                           | implemented by :py:`__eq__`         |
++--------+------------------------------------------+-------------------------------------+
+| ✗      | :py:`union(*others)`                     | see :py:`| other | …`               |
++--------+------------------------------------------+-------------------------------------+
+| ✓      | :py:`| other | …`                        | implemented by :py:`__or__`         |
++--------+------------------------------------------+-------------------------------------+
+| ✗      | :py:`intersection(*others)`              | see :py:`& other & …`               |
++--------+------------------------------------------+-------------------------------------+
+| ✓      | :py:`& other & …`:                       | implemented by :py:`__and__`        |
++--------+------------------------------------------+-------------------------------------+
+| ✗      | :py:`difference(*others)`                | see :py:`- other - …`               |
++--------+------------------------------------------+-------------------------------------+
+| ✓      | :py:`- other - …`                        | implemented by :py:`__sub__`        |
++--------+------------------------------------------+-------------------------------------+
+| ✗      | :py:`symmetric_difference(other)`        | see :py:`^ other`                   |
++--------+------------------------------------------+-------------------------------------+
+| ✓      | :py:`^ other`                            | implemented by :py:`__xor__`        |
++--------+------------------------------------------+-------------------------------------+
+| ✗      | :py:`copy()`                             |                                     |
++--------+------------------------------------------+-------------------------------------+
 
-- new functions:
-    ✗ :py:`iscontiguous()`:
-        return :py:`True` if the processors form a single contiguous set
+Mutable sets operations
+^^^^^^^^^^^^^^^^^^^^^^^
 
-    ✗ :py:`count()`:
-        could add a parameter :py:`minspan=1` to set the min width to count
-        interval
++--------+------------------------------------------+-------------------------------+
+| status | operation                                | comment                       |
++========+==========================================+===============================+
+| ✗      | :py:`update(*others)`                    | see :py:`|= other | …`        |
++--------+------------------------------------------+-------------------------------+
+| ✗      | :py:`|= other | …`                       | implemented by :py:`__ior__`  |
++--------+------------------------------------------+-------------------------------+
+| ✗      | :py:`intersection_update(*others)`       | see :py:`&= other & …`        |
++--------+------------------------------------------+-------------------------------+
+| ✗      | :py:`&= other & …`                       | implemented by :py:`__iand__` |
++--------+------------------------------------------+-------------------------------+
+| ✗      | :py:`difference_update(*others)`         | see :py:`-= other | …`        |
++--------+------------------------------------------+-------------------------------+
+| ✗      | :py:`-= other | …`                       | implemented by :py:`__isub__` |
++--------+------------------------------------------+-------------------------------+
+| ✗      | :py:`symmetric_difference_update(other)` | implemented by :py:`__ixor__` |
++--------+------------------------------------------+                               |
+| ✗      | :py:`^= other`                           |                               |
++--------+------------------------------------------+-------------------------------+
+| ✓      | :py:`add(elem)`                          |                               |
++--------+------------------------------------------+-------------------------------+
+| ✗      | :py:`remove(elem)`                       |                               |
++--------+------------------------------------------+-------------------------------+
+| ✗      | :py:`discard(elem)`                      |                               |
++--------+------------------------------------------+-------------------------------+
+| ✗      | :py:`pop()`                              |                               |
++--------+------------------------------------------+-------------------------------+
+| ✗      | :py:`clear()`                            |                               |
++--------+------------------------------------------+-------------------------------+
 
-- adapted functions:
-    ✗ :py:`aggregate()`:
-        return the smallest interval containing :py:`itvs`, could use
-        :py:`span` attribute with a property
+
+Specific operations
+-------------------
+
++--------+-------------------------------+-------------------------------------+
+| status | operation                     | comment                             |
++========+===============================+=====================================+
+| ✗      | :py:`iscontiguous()`          |                                     |
++--------+-------------------------------+-------------------------------------+
+| ✓      | :py:`count()`                 | could add an optional parameter     |
+|        |                               | :py:`minlen=1`, to count only       |
+|        |                               | intervals of minimum length         |
+|        |                               | :py:`minlen`                        |
++--------+-------------------------------+-------------------------------------+
+| ✓      | :py:`aggregate()`             |                                     |
++--------+-------------------------------+-------------------------------------+
 
 
-Deprecated functions
-====================
+Deprecated API
+==============
 
-✓ :py:`equals(itvs1, itvs2)`:
-    use :py:`==` instead
+The module `interval_set` provided an API to manipulate intervals' sets. The
+new API of `procset` has been wrapped in the module `intsetwrap`. The
+corresponding new API is detailed in the table below.
 
-✓ :py:`total(itvs)`:
-    use :py:`len` instead
+The module `intsetwrap` is intended as a temporary drop-in replacement to ease
+the migration.
+The module `intsetwrap` is planned for removal in the future major release, and
+the old API it exposes should not be used for new projects.
 
-✓ :py:`interval_set_to_id_list(itvs)`:
-    use :py:`list(itvs)` instead (possible through :py:`__iter__`)
++--------------------------------------+----------+--------------------------------+
+| old API functions                    | wrapped? | replacement                    |
++======================================+==========+================================+
+| :py:`aggregate(itvs)`                |        ✓ | :py:`pset.aggregate()`         |
++--------------------------------------+----------+--------------------------------+
+| :py:`difference(itvs1, itvs2)`       |        ✓ | :py:`pset1 - pset2`            |
++--------------------------------------+----------+--------------------------------+
+| :py:`equals(itvs1, itvs2)`           |        ✓ | :py:`pset1 == pset2`           |
++--------------------------------------+----------+--------------------------------+
+| :py:`id_list_to_iterval_set(idlist)` |        ✓ | :py:`ProcSet(*idlist)`         |
++--------------------------------------+----------+--------------------------------+
+| :py:`intersection(itvs1, itvs2)`     |        ✓ | :py:`pset1 & pset2`            |
++--------------------------------------+----------+--------------------------------+
+| :py:`interval_set_to_id_list(itvs)`  |        ✓ | :py:`list(pset)`               |
++--------------------------------------+----------+--------------------------------+
+| :py:`interval_set_to_set(itvs)`      |        ✓ | :py:`set(pset)`                |
++--------------------------------------+----------+--------------------------------+
+| :py:`interval_set_to_string(itvs)`   |        ✓ | :py:`str(pset)`,               |
+|                                      |          | :py:`format(pset)`             |
++--------------------------------------+----------+--------------------------------+
+| :py:`set_to_interval_set(idset)`     |        ✓ | :py:`ProcSet(*idset)`          |
++--------------------------------------+----------+--------------------------------+
+| :py:`string_to_interval_set(string)` |        ✓ | :py:`ProcSet.from_str(string)` |
++--------------------------------------+----------+--------------------------------+
+| :py:`total(itvs)`                    |        ✓ | :py:`len(pset)`                |
++--------------------------------------+----------+--------------------------------+
+| :py:`union(itvs1, itvs2)`            |        ✓ | :py:`pset1 | pset2`            |
++--------------------------------------+----------+--------------------------------+
 
-✓ :py:`interval_set_to_set(intervals)`:
-    use :py:`set(itvs)` instead (possible through :py:`__iter__`)
-
-✓ :py:`set_to_interval_set(s)`:
-    use constructor instead
-
-✓ :py:`id_list_to_iterval_set(ids)`:
-    use constructor instead
-
-✓ :py:`string_to_interval_set(s, separator=" ")`:
-    use :py:`from_str` instead
-
-✗ :py:`interval_set_to_string(intervals, separator=" ")`:
-    use :py:`__str__` or :py:`__format__` instead
-
-✓ :py:`difference(itvs_base, itvs2)`:
-    use :py:`-` instead
-
-✓ :py:`intersection(itvs1, itvs2)`:
-    use :py:`&` instead
-
-✓ :py:`union(itvs1, itvs2)`:
-    use :py:`|` instead
-
-✓ :py:`aggregate(itvs)`:
-    use :py:`aggregate` method instead
-
-Old API usage in evalys
-=======================
+Deprecated API usage in evalys
+------------------------------
 
 The comparison is made against commit d6d7234e51727adc0922b1df8826e5c6bd4b10ac.
 
-+========================+===========+=============+
-| function               | frequency | implemented |
-+========================+===========+=============+
-| difference             |         4 |             |
-+------------------------+-----------+-------------+
-| interval_set_to_set    |         3 |             |
-+------------------------+-----------+-------------+
-| string_to_interval_set |         3 |             |
-+------------------------+-----------+-------------+
-| intersection           |         2 |             |
-+------------------------+-----------+-------------+
-| total                  |         2 |             |
-+------------------------+-----------+-------------+
-| equals                 |         1 |             |
-+------------------------+-----------+-------------+
-| interval_set_to_string |         1 |             |
-+------------------------+-----------+-------------+
-| set_to_interval_set    |         1 |             |
-+------------------------+-----------+-------------+
-| union                  |         1 |             |
-+------------------------+-----------+-------------+
++------------------------+-----------+----------+
+| old API function       | frequency | wrapped? |
++========================+===========+==========+
+| difference             |         4 |        ✓ |
++------------------------+-----------+----------+
+| interval_set_to_set    |         3 |        ✓ |
++------------------------+-----------+----------+
+| string_to_interval_set |         3 |        ✓ |
++------------------------+-----------+----------+
+| intersection           |         2 |        ✓ |
++------------------------+-----------+----------+
+| total                  |         2 |        ✓ |
++------------------------+-----------+----------+
+| equals                 |         1 |        ✓ |
++------------------------+-----------+----------+
+| interval_set_to_string |         1 |        ✓ |
++------------------------+-----------+----------+
+| set_to_interval_set    |         1 |        ✓ |
++------------------------+-----------+----------+
+| union                  |         1 |        ✓ |
++------------------------+-----------+----------+
