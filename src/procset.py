@@ -296,8 +296,6 @@ class ProcSet:
         result._itvs = list(self._merge(self, other, operator.or_))
         return result
 
-    __ror__ = __or__
-
     def __eq__(self, other):
         # pylint: disable=protected-access
         return self._itvs == other._itvs
@@ -316,8 +314,6 @@ class ProcSet:
         result = ProcSet()
         result._itvs = list(self._merge(self, other, operator.and_))
         return result
-
-    __rand__ = __and__
 
     def difference(self, *others):
         raise NotImplementedError
@@ -341,8 +337,6 @@ class ProcSet:
         )
         return result
 
-    __rsub__ = __sub__
-
     def symmetric_difference(self, other):
         raise NotImplementedError
 
@@ -360,8 +354,6 @@ class ProcSet:
         result = ProcSet()
         result._itvs = list(self._merge(self, other, operator.xor))
         return result
-
-    __rxor__ = __xor__
 
     def copy(self):
         raise NotImplementedError
