@@ -232,6 +232,8 @@ class ProcSet:
     def _merge_core(cls, leftset, rightset, keeppredicate):
         """
         Generate the (flat) list of interval bounds of the requested merge.
+
+        The implementation is inspired by  http://stackoverflow.com/a/20062829.
         """
         endbound = False
         sentinel = _Sentinel()
