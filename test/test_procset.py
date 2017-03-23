@@ -135,6 +135,26 @@ class TestMisc:
         hull = ProcSet((0, 7))
         assert pset.aggregate() == hull
 
+    def test_iter_empty(self):
+        pset = ProcSet()
+        assert list(pset) == []
+        assert list(reversed(pset)) == list(reversed(list(pset)))
+
+    def test_iter_point(self):
+        pset = ProcSet(0)
+        assert list(pset) == [0]
+        assert list(reversed(pset)) == list(reversed(list(pset)))
+
+    def test_iter_single_interval(self):
+        pset = ProcSet((0, 1))
+        assert list(pset) == [0, 1]
+        assert list(reversed(pset)) == list(reversed(list(pset)))
+
+    def test_iter_many_interval(self):
+        pset = ProcSet((0, 1), (4, 7))
+        assert list(pset) == [0, 1, 4, 5, 6, 7]
+        assert list(reversed(pset)) == list(reversed(list(pset)))
+
 
 # pylint: disable=no-self-use,too-many-public-methods
 class TestStringParsing:

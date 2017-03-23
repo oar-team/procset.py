@@ -51,7 +51,7 @@ https://docs.python.org/3/reference/datamodel.html#emulating-container-types
 +--------+-------------------------------+-------------------------------------+
 | ✓      | :py:`iter(s)`                 | implemented by :py:`__iter__`       |
 +--------+-------------------------------+-------------------------------------+
-| ✗      | :py:`reversed(s)`             | implemented by :py:`__reversed__`   |
+| ✓      | :py:`reversed(s)`             | implemented by :py:`__reversed__`   |
 +--------+-------------------------------+-------------------------------------+
 
 

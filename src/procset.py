@@ -180,7 +180,8 @@ class ProcSet:
             yield from range(itv.inf, itv.sup + 1)
 
     def __reversed__(self):
-        raise NotImplementedError
+        for itv in reversed(self._itvs):
+            yield from range(itv.sup, itv.inf - 1, -1)
 
     def __contains__(self, item):
         raise NotImplementedError
