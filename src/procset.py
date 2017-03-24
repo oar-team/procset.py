@@ -176,10 +176,15 @@ class ProcSet:
     #     pass
 
     def __iter__(self):
+        """Iterate through the processors in self by increasing order."""
+        # as self._itvs is sorted by increasing order, we can directly yield
         for itv in self._itvs:
             yield from range(itv.inf, itv.sup + 1)
 
     def __reversed__(self):
+        """Iterate through the processors in self by decreasing order."""
+        # as self._itvs is sorted in increasing order, we yield from the
+        # reversed iterator
         for itv in reversed(self._itvs):
             yield from range(itv.sup, itv.inf - 1, -1)
 
