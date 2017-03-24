@@ -155,6 +155,40 @@ class TestMisc:
         assert list(pset) == [0, 1, 4, 5, 6, 7]
         assert list(reversed(pset)) == list(reversed(list(pset)))
 
+    def test_in_empty(self):
+        assert 0 not in ProcSet()
+
+    def test_in_single_point(self):
+        assert 0 in ProcSet(0)
+        assert 1 not in ProcSet(0)
+
+    def test_in_single_interval(self):
+        pset = ProcSet((0, 7))
+        for proc in range(0, 8):
+            assert proc in pset
+        assert 8 not in pset
+
+    def test_in_many_points(self):
+        pset = ProcSet(*range(0, 8, 2))
+        for proc in range(0, 8, 2):
+            assert proc in pset
+        for proc in range(1, 10, 2):
+            assert proc not in pset
+
+    def test_in_many_intervals(self):
+        pset = ProcSet((0, 3), (8, 11), (16, 19))
+        for proc in [*range(0, 4), *range(8, 12), *range(16, 20)]:
+            assert proc in pset
+        for proc in [*range(4, 8), *range(12, 16), *range(20, 24)]:
+            assert proc not in pset
+
+    def test_in_mixed_points_intervals(self):
+        pset = ProcSet((0, 3), 8, 10, (16, 19))
+        for proc in [*range(0, 4), 8, 10, *range(16, 20)]:
+            assert proc in pset
+        for proc in [*range(4, 8), 9, 11, *range(12, 16), *range(20, 24)]:
+            assert proc not in pset
+
 
 # pylint: disable=no-self-use,too-many-public-methods
 class TestStringParsing:

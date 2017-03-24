@@ -189,7 +189,18 @@ class ProcSet:
             yield from range(itv.sup, itv.inf - 1, -1)
 
     def __contains__(self, item):
-        raise NotImplementedError
+        """Check if item is in self."""
+        if self._itvs:
+            low, high = 0, len(self._itvs)
+            while low < high:
+                mid = (low + high) // 2
+                if item in self._itvs[mid]:
+                    return True
+                elif item < self._itvs[mid].inf:
+                    high = mid
+                else:
+                    low = mid + 1
+        return False
 
     def __len__(self):
         """Return the number of processors."""
