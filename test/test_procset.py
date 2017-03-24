@@ -189,6 +189,31 @@ class TestMisc:
         for proc in [*range(4, 8), 9, 11, *range(12, 16), *range(20, 24)]:
             assert proc not in pset
 
+    def test_min_max_empty(self):
+        with pytest.raises(ValueError, message='empty ProcSet'):
+            ProcSet().min
+        with pytest.raises(ValueError, message='empty ProcSet'):
+            ProcSet().max
+
+    def test_min_max_single_point(self):
+        pset = ProcSet(0)
+        assert pset.min == pset.max == 0
+
+    def test_min_max_single_interval(self):
+        pset = ProcSet((0, 7))
+        assert pset.min == 0
+        assert pset.max == 7
+
+    def test_min_max_many_points(self):
+        pset = ProcSet(0, 3, 4, 7)
+        assert pset.min == 0
+        assert pset.max == 7
+
+    def test_min_max_many_intervals(self):
+        pset = ProcSet((12, 25), (0, 7))
+        assert pset.min == 0
+        assert pset.max == 25
+
 
 # pylint: disable=no-self-use,too-many-public-methods
 class TestStringParsing:

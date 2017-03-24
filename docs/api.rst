@@ -73,9 +73,9 @@ https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range
 +--------+-------------------------------+-------------------------------------+
 | ✗      | :py:`del s[i]`                | implemented with :py:`__delitem__`  |
 +--------+-------------------------------+-------------------------------------+
-| ✗      | :py:`min(s)`                  | provide fast operations             |
-+--------+-------------------------------+                                     |
-| ✗      | :py:`max(s)`                  |                                     |
+| ✓      | :py:`s.min`                   | provide fast access to extremal     |
++--------+-------------------------------+ processors (i.e, bounds of the      |
+| ✓      | :py:`s.max`                   | convex hull)                        |
 +--------+-------------------------------+-------------------------------------+
 
 

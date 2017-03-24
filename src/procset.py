@@ -456,7 +456,22 @@ class ProcSet:
         interval containing all intervals from self.
         """
         if self._itvs:
-            inf, sup = self._itvs[0].inf, self._itvs[-1].sup
-            return ProcSet(ProcInt(inf, sup))
+            return ProcSet(ProcInt(self.min, self.max))
         else:
             return ProcSet()
+
+    @property
+    def min(self):
+        """The first processor in self (in increasing order)."""
+        try:
+            return self._itvs[0].inf
+        except IndexError:
+            raise ValueError('empty ProcSet') from None
+
+    @property
+    def max(self):
+        """The last processor in self (in increasing order)."""
+        try:
+            return self._itvs[-1].sup
+        except IndexError:
+            raise ValueError('empty ProcSet') from None
