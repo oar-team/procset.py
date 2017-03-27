@@ -460,6 +460,10 @@ class ProcSet:
         else:
             return ProcSet()
 
+    def intervals(self):
+        """Return an iterator on the intervals of self in increasing order."""
+        return iter(self._itvs)
+
     @property
     def min(self):
         """The first processor in self (in increasing order)."""

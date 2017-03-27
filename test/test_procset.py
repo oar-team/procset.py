@@ -214,6 +214,24 @@ class TestMisc:
         assert pset.min == 0
         assert pset.max == 25
 
+    def test_intervals_empty(self):
+        assert list(ProcSet().intervals()) == []
+
+    def test_intervals_single_point(self):
+        assert list(ProcSet(0).intervals()) == [(0, 0)]
+
+    def test_intervals_single_interval(self):
+        assert list(ProcSet((0, 1)).intervals()) == [(0, 1)]
+
+    def test_intervals_many_points(self):
+        assert list(ProcSet(0, 2, 4).intervals()) == [(0, 0), (2, 2), (4, 4)]
+
+    def test_intervals_many_intervals(self):
+        assert list(ProcSet((6, 7), (0, 3)).intervals()) == [(0, 3), (6, 7)]
+
+    def test_intervals_mixed_points_intervals(self):
+        assert list(ProcSet((6, 7), 12, (0, 3)).intervals()) == [(0, 3), (6, 7), (12, 12)]
+
 
 # pylint: disable=no-self-use,too-many-public-methods
 class TestStringParsing:

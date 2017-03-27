@@ -60,8 +60,7 @@ def interval_set_to_string(itvs, separator=" "):
 @_deprecated("Deprecated function: use ProcSet.from_str(s) instead.")
 def string_to_interval_set(string, separator=" "):
     """[deprecated] Transform a string to an intervals' set."""
-    # pylint: disable=protected-access
-    return ProcSet.from_str(string, outsep=separator)._itvs
+    return list(ProcSet.from_str(string, outsep=separator).intervals())
 
 
 # old API implementation: ID list conversions
@@ -69,8 +68,7 @@ def string_to_interval_set(string, separator=" "):
 @_deprecated("Deprecated function: use ProcSet(*ids) instead.")
 def id_list_to_iterval_set(idlist):
     """[deprecated] Convert a list of ID (int) into an intervals' set."""
-    # pylint: disable=protected-access
-    return ProcSet(*idlist)._itvs
+    return list(ProcSet(*idlist).intervals())
 
 
 @_deprecated("Deprecated function: use list(itvs) instead.")
@@ -90,8 +88,7 @@ def interval_set_to_set(itvs):
 @_deprecated("Deprecated function: use ProcSet(*s) instead.")
 def set_to_interval_set(idset):
     """[deprecated] Convert a set of ID (int) into an intervals' set."""
-    # pylint: disable=protected-access
-    return ProcSet(*idset)._itvs
+    return list(ProcSet(*idset).intervals())
 
 
 # old API implementation: statistics
@@ -116,8 +113,7 @@ def difference(itvs1, itvs2):
     [deprecated] Return the intervals' set containing elements in the first set
     but not in the second.
     """
-    # pylint: disable=protected-access
-    return (ProcSet(*itvs1) - ProcSet(*itvs2))._itvs
+    return list((ProcSet(*itvs1) - ProcSet(*itvs2)).intervals())
 
 
 @_deprecated("Deprecated function: use itvs1 & itvs2 instead.")
@@ -126,8 +122,7 @@ def intersection(itvs1, itvs2):
     [deprecated] Return the intervals' set containing elements common to the
     first and second sets.
     """
-    # pylint: disable=protected-access
-    return (ProcSet(*itvs1) & ProcSet(*itvs2))._itvs
+    return list((ProcSet(*itvs1) & ProcSet(*itvs2)).intervals())
 
 
 @_deprecated("Deprecated function: use itvs1 | itvs2 instead.")
@@ -136,8 +131,7 @@ def union(itvs1, itvs2):
     [deprecated] Return the intervals' set with the elements from the first set
     and the second set.
     """
-    # pylint: disable=protected-access
-    return (ProcSet(*itvs1) | ProcSet(*itvs2))._itvs
+    return list((ProcSet(*itvs1) | ProcSet(*itvs2)).intervals())
 
 
 @_deprecated("Deprecated function: use aggregate method instead.")
@@ -146,5 +140,4 @@ def aggregate(itvs):
     [deprecated] Return the smallest interval containing all intervals from the
     given intervals' set.
     """
-    # pylint: disable=protected-access
-    return ProcSet(*itvs).aggregate()._itvs
+    return list(ProcSet(*itvs).aggregate().intervals())
