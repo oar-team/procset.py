@@ -25,3 +25,9 @@ Limitations
 - The provided implementation target only Python 3 (I do not want to maintain
   old stuff :P).
 - The intervals bounds have to be non-negative integers.
+
+
+Requirements
+------------
+
+- `setuptools>=34.4.0`
