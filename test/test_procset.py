@@ -232,6 +232,24 @@ class TestMisc:
     def test_intervals_mixed_points_intervals(self):
         assert list(ProcSet((6, 7), 12, (0, 3)).intervals()) == [(0, 3), (6, 7), (12, 12)]
 
+    def test_iscontiguous_empty(self):
+        assert ProcSet().iscontiguous()
+
+    def test_iscontiguous_single_point(self):
+        assert ProcSet(1).iscontiguous()
+
+    def test_iscontiguous_single_interval(self):
+        assert ProcSet((0, 2)).iscontiguous()
+
+    def test_iscontiguous_many_points(self):
+        assert not ProcSet(0, 4).iscontiguous()
+
+    def test_iscontiguous_many_intervals(self):
+        assert not ProcSet((0, 2), (4, 7)).iscontiguous()
+
+    def test_iscontiguous_mixed_points_intervals(self):
+        assert not ProcSet(0, (3, 5)).iscontiguous()
+
 
 # pylint: disable=no-self-use,too-many-public-methods
 class TestStringParsing:

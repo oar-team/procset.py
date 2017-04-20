@@ -165,7 +165,7 @@ Specific operations
 +--------+-------------------------------+-------------------------------------+
 | status | operation                     | comment                             |
 +========+===============================+=====================================+
-| ✗      | :py:`iscontiguous()`          |                                     |
+| ✓      | :py:`iscontiguous()`          | empty set is considered contiguous  |
 +--------+-------------------------------+-------------------------------------+
 | ✓      | :py:`count()`                 | could add an optional parameter     |
 |        |                               | :py:`minlen=1`, to count only       |

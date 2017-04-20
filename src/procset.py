@@ -212,7 +212,7 @@ class ProcSet:
 
     def iscontiguous(self):
         """Return True if the processors form a single contiguous set."""
-        return self.count() == 1
+        return self.count() <= 1
 
     def isdisjoint(self, other):
         raise NotImplementedError
