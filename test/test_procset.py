@@ -115,7 +115,7 @@ class TestMisc:
         assert id(pset1) != id(pset2)
         assert pset1 != pset2
 
-    def test_aggregate_empy(self):
+    def test_aggregate_empty(self):
         pset = ProcSet()
         hull = ProcSet()
         assert pset.aggregate() == hull
