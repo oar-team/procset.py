@@ -377,25 +377,55 @@ class ProcSet:
         raise NotImplementedError
 
     def __ior__(self, other):
-        raise NotImplementedError
+        """Update the ProcSet, adding the intervals from other."""
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+
+        self._itvs = list(self._merge(self, other, operator.or_))
+        return self
 
     def intersection_update(self, *others):
         raise NotImplementedError
 
     def __iand__(self, other):
-        raise NotImplementedError
+        """
+        Update the ProcSet, keeping only the intervals found in self and other.
+        """
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+
+        self._itvs = list(self._merge(self, other, operator.and_))
+        return self
 
     def difference_update(self, *others):
         raise NotImplementedError
 
     def __isub__(self, other):
-        raise NotImplementedError
+        """Update the ProcSet, removing the intervals found in other."""
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+
+        self._itvs = list(
+            self._merge(
+                self, other,
+                lambda inleft, inright: inleft and not inright
+            )
+        )
+        return self
 
     def symmetric_difference_update(self, other):
         raise NotImplementedError
 
     def __ixor__(self, other):
-        raise NotImplementedError
+        """
+        Update the ProcSet, keeping only the intervals found in either self or
+        other, but not in both.
+        """
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+
+        self._itvs = list(self._merge(self, other, operator.xor))
+        return self
 
     def add(self, elem):
         """

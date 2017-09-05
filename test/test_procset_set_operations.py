@@ -66,6 +66,29 @@ def build_merge_test(testcase):
     return merge_test
 
 
+def build_inplace_test(testcase):
+    def inplace_test(self):
+        left_pset = ProcSet(*testcase.left)
+        left_orig = left_pset
+        right_pset = ProcSet(*testcase.right)
+        left_pset = self.operator(left_pset, right_pset)
+
+        # ensure we did not modify right operand
+        assert right_pset == ProcSet(*testcase.right)
+
+        # ensure we effectively modified in place the left operand
+        assert left_pset is left_orig
+
+        # check corectness of result
+        assert len(left_pset) == testcase.expect_len
+        assert left_pset.count() == testcase.expect_count
+        assert tuple(left_pset) == testcase.expect_res
+
+    inplace_test.__doc__ = testcase.doc
+
+    return inplace_test
+
+
 ##### testcases #####
 
 DIFFERENCE_TESTCASES = {
@@ -2116,12 +2139,24 @@ TestMergeDifference = build_test_class(
     DIFFERENCE_TESTCASES,
     build_merge_test
 )
+TestInPlaceDifference = build_test_class(
+    'TestInPlaceDifference',
+    operator.__isub__,
+    DIFFERENCE_TESTCASES,
+    build_inplace_test
+)
 
 TestMergeIntersection = build_test_class(
     'TestMergeIntersection',
     operator.__and__,
     INTERSECTION_TESTCASES,
     build_merge_test
+)
+TestInPlaceIntersection = build_test_class(
+    'TestInPlaceIntersection',
+    operator.__iand__,
+    INTERSECTION_TESTCASES,
+    build_inplace_test
 )
 
 TestMergeSymmetricDifference = build_test_class(
@@ -2130,10 +2165,22 @@ TestMergeSymmetricDifference = build_test_class(
     SYMMETRIC_DIFFERENCE_TESTCASES,
     build_merge_test
 )
+TestInPlaceSymmetricDifference = build_test_class(
+    'TestInPlaceSymmetricDifference',
+    operator.__ixor__,
+    SYMMETRIC_DIFFERENCE_TESTCASES,
+    build_inplace_test
+)
 
 TestMergeUnion = build_test_class(
     'TestMergeUnion',
     operator.__or__,
     UNION_TESTCASES,
     build_merge_test
+)
+TestInPlaceUnion = build_test_class(
+    'TestInPlaceUnion',
+    operator.__ior__,
+    UNION_TESTCASES,
+    build_inplace_test
 )
