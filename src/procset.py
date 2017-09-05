@@ -14,7 +14,7 @@
 #   GNU General Public License for more details.
 #
 #   You should have received a copy of the GNU General Public License
-#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
 Toolkit to manage sets of closed intervals.
@@ -249,7 +249,7 @@ class ProcSet:
         """
         Generate the (flat) list of interval bounds of the requested merge.
 
-        The implementation is inspired by  http://stackoverflow.com/a/20062829.
+        The implementation is inspired by https://stackoverflow.com/a/20062829.
         """
         endbound = False
         sentinel = _Sentinel()
