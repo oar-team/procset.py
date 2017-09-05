@@ -153,11 +153,6 @@ class ProcSet:
 
         return new_pset
 
-    @classmethod
-    def _from_iterable(cls, it):
-        """Construct an instance of the class from any iterable input."""
-        return cls(*it)
-
     def __str__(self):
         return format(self)
 
@@ -306,8 +301,9 @@ class ProcSet:
             return NotImplemented
 
         # pylint: disable=protected-access
-        # we do not use self._from_iterable as we know the result already is a
-        # valid _itvs list
+        # We directly assign result._itvs as self._merge(…) returns a valid
+        # _itvs list. This is the same as ProcSet(*self._merge(…)), minus the
+        # input validation step.
         result = ProcSet()
         result._itvs = list(self._merge(self, other, operator.or_))
         return result
@@ -325,8 +321,9 @@ class ProcSet:
             return NotImplemented
 
         # pylint: disable=protected-access
-        # we do not use self._from_iterable as we know the result already is a
-        # valid _itvs list
+        # We directly assign result._itvs as self._merge(…) returns a valid
+        # _itvs list. This is the same as ProcSet(*self._merge(…)), minus the
+        # input validation step.
         result = ProcSet()
         result._itvs = list(self._merge(self, other, operator.and_))
         return result
@@ -342,8 +339,9 @@ class ProcSet:
             return NotImplemented
 
         # pylint: disable=protected-access
-        # we do not use self._from_iterable as we know the result already is a
-        # valid _itvs list
+        # We directly assign result._itvs as self._merge(…) returns a valid
+        # _itvs list. This is the same as ProcSet(*self._merge(…)), minus the
+        # input validation step.
         result = ProcSet()
         result._itvs = list(
             self._merge(
@@ -365,8 +363,9 @@ class ProcSet:
             return NotImplemented
 
         # pylint: disable=protected-access
-        # we do not use self._from_iterable as we know the result already is a
-        # valid _itvs list
+        # We directly assign result._itvs as self._merge(…) returns a valid
+        # _itvs list. This is the same as ProcSet(*self._merge(…)), minus the
+        # input validation step.
         result = ProcSet()
         result._itvs = list(self._merge(self, other, operator.xor))
         return result
