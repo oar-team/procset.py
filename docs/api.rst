@@ -24,7 +24,8 @@ Basic operations
 | ✓      | :py:`format(s, format_spec)` | - implemented by :py:`__format__`    |
 |        |                              | - the defaults separators are:       |
 |        |                              |     - inner :py:`-`                  |
-|        |                              |     - outer :py:` `                  |
+|        |                              |     - outer :py:`␣`                  |
+|        |                              |       (space, ascii code `0x20`)     |
 |        |                              | - the :py:`format_spec` is a string  |
 |        |                              |   of length 2, where the inner       |
 |        |                              |   (resp. outer) separator is the     |
