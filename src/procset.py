@@ -105,9 +105,9 @@ class ProcSet:
         """
         Initialize a ProcSet.
 
-        A ProcSet can be intialized with either nothing (empty set), any number
-        of non-negative int, any number of ProcInt compatible objects (iterable
-        of 2 ints), or any combination of both.
+        A ProcSet can be initialized with either nothing (empty set), any
+        number of non-negative int, any number of ProcInt compatible objects
+        (iterable of exactly 2 ints), or any combination of both.
 
         There are no restrictions on the domains of the intervals in the
         constructor: they may overlap.
@@ -356,8 +356,8 @@ class ProcSet:
 
     def __xor__(self, other):
         """
-        Return a new ProcSet with the intervals in either self or other but not
-        both.
+        Return a new ProcSet with the intervals in either self or other, but
+        not both.
         """
         if not isinstance(other, self.__class__):
             return NotImplemented
@@ -431,8 +431,8 @@ class ProcSet:
         """
         Insert elem into self.
 
-        It is assumed elem is ProcInt compatible (iterable of 2 ints), or a
-        single int.
+        It is assumed elem is ProcInt compatible (iterable of exaclty 2 ints),
+        or a single int.
         In the first case, ProcInt(*elem) is added into self, in the latter
         ProcInt(elem, elem) is added.
 
