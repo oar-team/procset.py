@@ -43,21 +43,21 @@ class TestNew:
             assert point in itv
 
     def test_enforce_nonnegative(self):
-        with pytest.raises(ValueError, message='Invalid negative bound(s)'):
+        with pytest.raises(ValueError, match='^Invalid negative bound\(s\)$'):
             ProcInt(-1, 0)
-        with pytest.raises(ValueError, message='Invalid negative bound(s)'):
+        with pytest.raises(ValueError, match='^Invalid negative bound\(s\)$'):
             ProcInt(-15, -1)
 
     def test_bad_type_inf(self):
-        with pytest.raises(TypeError, message='ProcInt() argument inf must be int'):
+        with pytest.raises(TypeError, match='^ProcInt\(\) argument inf must be int$'):
             ProcInt('dummy string', 0)
 
     def test_bad_type_sup(self):
-        with pytest.raises(TypeError, message='ProcInt() argument sup must be int'):
+        with pytest.raises(TypeError, match='^ProcInt\(\) argument sup must be int$'):
             ProcInt(0, None)
 
     def test_bad_reversed_args(self):
-        with pytest.raises(ValueError, message='Invalid interval bounds'):
+        with pytest.raises(ValueError, match='^Invalid interval bounds$'):
             ProcInt(42, 1)
 
 
@@ -91,5 +91,5 @@ class TestDisplay:
         assert repr(itv) == 'ProcInt(inf=0, sup=41)'
 
     def test_bad_format_spec(self):
-        with pytest.raises(ValueError, message='Invalid format specifier'):
+        with pytest.raises(ValueError, match='^Invalid format specifier$'):
             format(ProcInt(0, 2), '--')

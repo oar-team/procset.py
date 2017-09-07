@@ -190,9 +190,9 @@ class TestMisc:
             assert proc not in pset
 
     def test_min_max_empty(self):
-        with pytest.raises(ValueError, message='empty ProcSet'):
+        with pytest.raises(ValueError, match='^empty ProcSet$'):
             ProcSet().min
-        with pytest.raises(ValueError, message='empty ProcSet'):
+        with pytest.raises(ValueError, match='^empty ProcSet$'):
             ProcSet().max
 
     def test_min_max_single_point(self):
@@ -278,19 +278,19 @@ class TestStringParsing:
         assert pset == ProcSet(ProcInt(0, 3))
 
     def test_nostring(self):
-        with pytest.raises(TypeError, message='from_str() argument 2 must be str, not int'):
+        with pytest.raises(TypeError, match='^from_str\(\) argument 2 must be str, not int$'):
             ProcSet.from_str(42)
 
     def test_missing_left(self):
-        with pytest.raises(ValueError, message='Invalid interval format, parsed string is: -1'):
+        with pytest.raises(ValueError, match='^Invalid interval format, parsed string is: -1$'):
             ProcSet.from_str('-1')
 
     def test_missing_right(self):
-        with pytest.raises(ValueError, message='Invalid interval format, parsed string is: 0-'):
+        with pytest.raises(ValueError, match='^Invalid interval format, parsed string is: 0-$'):
             ProcSet.from_str('0-')
 
     def test_many_contig(self):
-        with pytest.raises(ValueError, message='Invalid interval format, parsed string is: 1-2-3'):
+        with pytest.raises(ValueError, match='^Invalid interval format, parsed string is: 1-2-3$'):
             ProcSet.from_str('1-2-3')
 
 
@@ -325,11 +325,11 @@ class TestDisplay:
         assert format(pset, '') == str(pset)
 
     def test_bad_format_spec_short(self):
-        with pytest.raises(ValueError, message='Invalid format specifier'):
+        with pytest.raises(ValueError, match='^Invalid format specifier$'):
             format(ProcSet(), ';')
 
     def test_bad_format_spec_long(self):
-        with pytest.raises(ValueError, message='Invalid format specifier'):
+        with pytest.raises(ValueError, match='^Invalid format specifier$'):
             format(ProcSet(), ':--')
 
 
