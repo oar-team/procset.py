@@ -20,7 +20,7 @@
 Toolkit to manage sets of closed intervals.
 
 This implementation requires intervals bounds to be non-negative integers. This
-design choice has been made as procset targets managment of resources for
+design choice has been made as procset aims at managing resources for
 scheduling. Hence, the manipulated intervals can be represented as indexes.
 """
 
@@ -107,7 +107,7 @@ class ProcSet:
 
         A ProcSet can be initialized with either nothing (empty set), any
         number of non-negative int, any number of ProcInt compatible objects
-        (iterable of exactly 2 ints), or any combination of both.
+        (iterable of exactly 2 int), or any combination of both.
 
         There are no restrictions on the domains of the intervals in the
         constructor: they may overlap.
