@@ -123,7 +123,7 @@ class ProcSet:
             ProcSet((0, 1), [2, 3])  # identical to previous call
             ProcSet(ProcInt(0, 1), *[0, 3])  # mixing ProcInt and lists
         """
-        self._itvs = []  # list of disjoint intervals
+        self._itvs = []  # list of disjoint intervals, in increasing order
         for itv in intervals:
             self.add(itv)
 
@@ -242,8 +242,8 @@ class ProcSet:
             # intervals
             yield True, itv.sup + 1
 
-    @classmethod
-    def _merge_core(cls, leftset, rightset, keeppredicate):
+    @staticmethod
+    def _merge_core(leftset, rightset, keeppredicate):
         """
         Generate the (flat) list of interval bounds of the requested merge.
 
@@ -434,7 +434,7 @@ class ProcSet:
         """
         Insert elem into self.
 
-        It is assumed elem is ProcInt compatible (iterable of exaclty 2 ints),
+        It is assumed elem is ProcInt compatible (iterable of exactly 2 int),
         or a single int.
         In the first case, ProcInt(*elem) is added into self, in the latter
         ProcInt(elem, elem) is added.
@@ -445,19 +445,13 @@ class ProcSet:
         try:
             newinf, newsup = elem  # assume it is ProcInt compatible
         except TypeError:
-            newinf, newsup = elem, elem  # if not assume it is a single point
+            newinf, newsup = elem, elem  # if not, assume it is a single point
 
-        for itv in list(self._itvs):
-            if newinf > itv.sup + 1:
-                continue
-            if newsup + 1 < itv.inf:
-                break
-            self._itvs.remove(itv)
-            newinf = min(newinf, itv.inf)
-            newsup = max(newsup, itv.sup)
-
-        self._itvs.append(ProcInt(newinf, newsup))
-        self._itvs.sort()
+        # avoid infinite recursion by bypassing add(…) method and directly
+        # setting new_pset._itvs
+        new_pset = ProcSet()
+        new_pset._itvs = [ProcInt(newinf, newsup)]
+        self |= new_pset
 
     def remove(self, elem):
         raise NotImplementedError
