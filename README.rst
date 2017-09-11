@@ -12,7 +12,7 @@ useful when writing schedulers.
 Features
 --------
 
-- Free Software: licensed under GPLv3+ (see `<LICENSE.rst>`_).
+- Free Software: licensed under LGPLv3 (see `<LICENSE.rst>`_).
 - Pure Python module :)
 - Thoroughly tested!
 - Drop-in replacement for `interval_set` (see `intsetwrap.py
