@@ -85,6 +85,7 @@ class TestDisplay:
         assert format(itv, ':') == '0'
         assert format(itv) == str(itv)
         assert repr(itv) == 'ProcInt(inf=0, sup=0)'
+        assert itv == eval(repr(itv))
 
     def test_wide(self):
         itv = ProcInt(0, 41)
@@ -92,6 +93,7 @@ class TestDisplay:
         assert format(itv, ':') == '0:41'
         assert format(itv) == str(itv)
         assert repr(itv) == 'ProcInt(inf=0, sup=41)'
+        assert itv == eval(repr(itv))
 
     def test_bad_format_spec(self):
         with pytest.raises(ValueError, match='^Invalid format specifier$'):
