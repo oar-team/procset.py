@@ -305,6 +305,8 @@ class TestDisplay:
         assert format(pset, ':,') == ''
         assert format(pset) == str(pset)
         assert format(pset, '') == str(pset)
+        assert repr(pset) == 'ProcSet()'
+        assert pset == eval(repr(pset))
 
     def test_single_point(self):
         pset = ProcSet(ProcInt(0, 0))
@@ -312,6 +314,17 @@ class TestDisplay:
         assert format(pset, ':,') == '0'
         assert format(pset) == str(pset)
         assert format(pset, '') == str(pset)
+        assert repr(pset) == 'ProcSet(0)'
+        assert pset == eval(repr(pset))
+
+    def test_small(self):
+        pset = ProcSet(ProcInt(0, 1))
+        assert str(pset) == '0-1'
+        assert format(pset, ':,') == '0:1'
+        assert format(pset) == str(pset)
+        assert format(pset, '') == str(pset)
+        assert repr(pset) == 'ProcSet((0, 1))'
+        assert pset == eval(repr(pset))
 
     def test_contiguous(self):
         pset = ProcSet(ProcInt(0, 7))
@@ -319,6 +332,8 @@ class TestDisplay:
         assert format(pset, ':,') == '0:7'
         assert format(pset) == str(pset)
         assert format(pset, '') == str(pset)
+        assert repr(pset) == 'ProcSet((0, 7))'
+        assert pset == eval(repr(pset))
 
     def test_disjoint(self):
         pset = ProcSet(ProcInt(0, 3), ProcInt(7, 15))
@@ -326,6 +341,8 @@ class TestDisplay:
         assert format(pset, ':,') == '0:3,7:15'
         assert format(pset) == str(pset)
         assert format(pset, '') == str(pset)
+        assert repr(pset) == 'ProcSet((0, 3), (7, 15))'
+        assert pset == eval(repr(pset))
 
     def test_bad_format_spec_short(self):
         with pytest.raises(ValueError, match='^Invalid format specifier$'):

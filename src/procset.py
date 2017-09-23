@@ -170,8 +170,10 @@ class ProcSet:
 
         return outsep.join(format(itv, insep) for itv in self._itvs)
 
-    # def __repr__(self):
-    #     pass
+    def __repr__(self):
+        compact = lambda itv: str(tuple(itv)) if len(itv) > 1 else str(itv.inf)
+        args = (compact(itv) for itv in self._itvs)
+        return '{}({})'.format(self.__class__.__name__, ', '.join(args))
 
     def __iter__(self):
         """Iterate through the processors in self by increasing order."""

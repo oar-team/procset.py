@@ -16,24 +16,25 @@ The implementation status is indicated by the bullet:
 Basic operations
 ----------------
 
-+--------+------------------------------+--------------------------------------+
-| status | operation                    | comment                              |
-+========+==============================+======================================+
-| ✓      | :py:`str(s)`                 | implemented by :py:`__str__`         |
-+--------+------------------------------+--------------------------------------+
-| ✓      | :py:`format(s, format_spec)` | - implemented by :py:`__format__`    |
-|        |                              | - the defaults separators are:       |
-|        |                              |     - inner :py:`-`                  |
-|        |                              |     - outer :py:`␣`                  |
-|        |                              |       (space, ascii code `0x20`)     |
-|        |                              | - the :py:`format_spec` is a string  |
-|        |                              |   of length 2, where the inner       |
-|        |                              |   (resp. outer) separator is the     |
-|        |                              |   first (resp. second) item          |
-|        |                              | - :py:`format(s, '')` matches the    |
-|        |                              |   behavior of :py:`str` as           |
-|        |                              |   recommended in the documentation   |
-+--------+------------------------------+--------------------------------------+
++--------+------------------------------+--------------------------------------------------------------------------+
+| status | operation                    | comment                                                                  |
++========+==============================+==========================================================================+
+| ✓      | :py:`str(s)`                 | implemented by :py:`__str__`                                             |
++--------+------------------------------+--------------------------------------------------------------------------+
+| ✓      | :py:`repr(s)`                | - implemented by :py:`__repr__`                                          |
+|        |                              | - see https://docs.python.org/3/reference/datamodel.html#object.__repr__ |
+|        |                              |   for details about the expected behavior                                |
++--------+------------------------------+--------------------------------------------------------------------------+
+| ✓      | :py:`format(s, format_spec)` | - implemented by :py:`__format__`                                        |
+|        |                              | - the defaults separators are:                                           |
+|        |                              |     - inner :py:`-`                                                      |
+|        |                              |     - outer :py:`␣` (space, ascii code `0x20`)                           |
+|        |                              | - the :py:`format_spec` is a string of length 2, where the inner         |
+|        |                              |   (resp. outer) separator is the first (resp. second) item               |
+|        |                              | - :py:`format(s, '')` matches the behavior of :py:`str` as recommended   |
+|        |                              |   in the documentation, see                                              |
+|        |                              |   https://docs.python.org/3/reference/datamodel.html#object.__str__      |
++--------+------------------------------+--------------------------------------------------------------------------+
 
 
 Container-like operations
