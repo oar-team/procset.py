@@ -309,7 +309,7 @@ class ProcSet:
         # We directly assign result._itvs as self._merge(…) returns a valid
         # _itvs list. This is the same as ProcSet(*self._merge(…)), minus the
         # input validation step.
-        result = ProcSet()
+        result = type(self)()
         result._itvs = list(self._merge(self, other, operator.or_))
         return result
 
@@ -329,7 +329,7 @@ class ProcSet:
         # We directly assign result._itvs as self._merge(…) returns a valid
         # _itvs list. This is the same as ProcSet(*self._merge(…)), minus the
         # input validation step.
-        result = ProcSet()
+        result = type(self)()
         result._itvs = list(self._merge(self, other, operator.and_))
         return result
 
@@ -347,7 +347,7 @@ class ProcSet:
         # We directly assign result._itvs as self._merge(…) returns a valid
         # _itvs list. This is the same as ProcSet(*self._merge(…)), minus the
         # input validation step.
-        result = ProcSet()
+        result = type(self)()
         result._itvs = list(
             self._merge(
                 self, other,
@@ -371,7 +371,7 @@ class ProcSet:
         # We directly assign result._itvs as self._merge(…) returns a valid
         # _itvs list. This is the same as ProcSet(*self._merge(…)), minus the
         # input validation step.
-        result = ProcSet()
+        result = type(self)()
         result._itvs = list(self._merge(self, other, operator.xor))
         return result
 
@@ -451,7 +451,7 @@ class ProcSet:
 
         # avoid infinite recursion by bypassing add(…) method and directly
         # setting new_pset._itvs
-        new_pset = ProcSet()
+        new_pset = type(self)()
         new_pset._itvs = [ProcInt(newinf, newsup)]
         self |= new_pset
 
@@ -484,9 +484,9 @@ class ProcSet:
         interval containing all intervals from self.
         """
         if self._itvs:
-            return ProcSet(ProcInt(self.min, self.max))
+            return type(self)(ProcInt(self.min, self.max))
         else:
-            return ProcSet()
+            return type(self)()
 
     def intervals(self):
         """Return an iterator on the intervals of self in increasing order."""
