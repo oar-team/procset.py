@@ -49,7 +49,7 @@ class ProcInt(tuple):
 
     def __repr__(self):
         """Return a nicely formatted representation string."""
-        return '{}(inf={!r}, sup={!r})'.format(self.__class__.__name__, *self)
+        return '{}(inf={!r}, sup={!r})'.format(type(self).__name__, *self)
 
     def __str__(self):
         return format(self)
@@ -132,7 +132,7 @@ class ProcSet:
         """Parse a string interval set representation into a ProcSet."""
         if not isinstance(string, str):
             raise TypeError(
-                'from_str() argument 2 must be str, not {}'.format(string.__class__.__name__)
+                'from_str() argument 2 must be str, not {}'.format(type(string).__name__)
             )
 
         new_pset = cls()
@@ -173,7 +173,7 @@ class ProcSet:
     def __repr__(self):
         compact = lambda itv: str(tuple(itv)) if len(itv) > 1 else str(itv.inf)
         args = (compact(itv) for itv in self._itvs)
-        return '{}({})'.format(self.__class__.__name__, ', '.join(args))
+        return '{}({})'.format(type(self).__name__, ', '.join(args))
 
     def __iter__(self):
         """Iterate through the processors in self by increasing order."""
@@ -302,7 +302,7 @@ class ProcSet:
 
     def __or__(self, other):
         """Return a new ProcSet with the intervals from self and other."""
-        if not isinstance(other, self.__class__):
+        if not isinstance(other, type(self)):
             return NotImplemented
 
         # pylint: disable=protected-access
@@ -322,7 +322,7 @@ class ProcSet:
 
     def __and__(self, other):
         """Return a new ProcSet with the intervals common to self and other."""
-        if not isinstance(other, self.__class__):
+        if not isinstance(other, type(self)):
             return NotImplemented
 
         # pylint: disable=protected-access
@@ -340,7 +340,7 @@ class ProcSet:
         """
         Return a new ProcSet with the intervals in self that are not in other.
         """
-        if not isinstance(other, self.__class__):
+        if not isinstance(other, type(self)):
             return NotImplemented
 
         # pylint: disable=protected-access
@@ -364,7 +364,7 @@ class ProcSet:
         Return a new ProcSet with the intervals in either self or other, but
         not both.
         """
-        if not isinstance(other, self.__class__):
+        if not isinstance(other, type(self)):
             return NotImplemented
 
         # pylint: disable=protected-access
@@ -383,7 +383,7 @@ class ProcSet:
 
     def __ior__(self, other):
         """Update the ProcSet, adding the intervals from other."""
-        if not isinstance(other, self.__class__):
+        if not isinstance(other, type(self)):
             return NotImplemented
 
         self._itvs = list(self._merge(self, other, operator.or_))
@@ -396,7 +396,7 @@ class ProcSet:
         """
         Update the ProcSet, keeping only the intervals found in self and other.
         """
-        if not isinstance(other, self.__class__):
+        if not isinstance(other, type(self)):
             return NotImplemented
 
         self._itvs = list(self._merge(self, other, operator.and_))
@@ -407,7 +407,7 @@ class ProcSet:
 
     def __isub__(self, other):
         """Update the ProcSet, removing the intervals found in other."""
-        if not isinstance(other, self.__class__):
+        if not isinstance(other, type(self)):
             return NotImplemented
 
         self._itvs = list(
@@ -426,7 +426,7 @@ class ProcSet:
         Update the ProcSet, keeping only the intervals found in either self or
         other, but not in both.
         """
-        if not isinstance(other, self.__class__):
+        if not isinstance(other, type(self)):
             return NotImplemented
 
         self._itvs = list(self._merge(self, other, operator.xor))
