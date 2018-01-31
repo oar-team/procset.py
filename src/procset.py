@@ -379,6 +379,7 @@ class ProcSet:
         return result
 
     def copy(self):
+        # pylint: disable=protected-access
         # We directly assign result._itvs as self._itvs is a valid list.  Note
         # that a ProcSet is nothing more than a container with some extra
         # methods, and a given structure.  As the current implementation relies
@@ -463,7 +464,8 @@ class ProcSet:
         except TypeError:
             newinf, newsup = elem, elem  # if not, assume it is a single point
 
-        # avoid infinite recursion by bypassing add(…) method and directly
+        # pylint: disable=protected-access
+        # Avoid infinite recursion by bypassing add(…) method and directly
         # setting new_pset._itvs
         new_pset = type(self)()
         new_pset._itvs = [ProcInt(newinf, newsup)]
