@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright © 2017
+# Copyright © 2017, 2018
 # Contributed by Raphaël Bleuse <raphael.bleuse@imag.fr>
 #
 # This file is part of procset.py, a pure python module to manage sets of
@@ -46,6 +46,9 @@ class ProcInt(tuple):
         if inf < 0:
             raise ValueError('Invalid negative bound(s)')
         return tuple.__new__(cls, (inf, sup))
+
+    def __getnewargs__(self):
+        return tuple(self)
 
     def __repr__(self):
         """Return a nicely formatted representation string."""
@@ -376,7 +379,18 @@ class ProcSet:
         return result
 
     def copy(self):
-        raise NotImplementedError
+        # We directly assign result._itvs as self._itvs is a valid list.  Note
+        # that a ProcSet is nothing more than a container with some extra
+        # methods, and a given structure.  As the current implementation relies
+        # on the _itvs list, copying a ProcSet is the same as copying the _itvs
+        # list.  Hence, we need to ensure a new _itvs list is created (and not
+        # just a reference to self._itvs).  As _itvs is a list of ProcInt, a
+        # shallow copy is the same as a deep copy.
+        result = type(self)()
+        result._itvs = self._itvs.copy()
+        return result
+
+    __copy__ = copy  # ensure compatibility with standard module copy
 
     def update(self, *others):
         raise NotImplementedError

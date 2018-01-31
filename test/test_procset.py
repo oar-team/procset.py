@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright © 2017
+# Copyright © 2017, 2018
 # Contributed by Raphaël Bleuse <raphael.bleuse@imag.fr>
 #
 # This file is part of procset.py, a pure python module to manage sets of
@@ -19,6 +19,7 @@
 #   License version 3 along with this program.  If not, see
 #   <https://www.gnu.org/licenses/>.
 
+import copy
 import pytest
 from procset import ProcInt, ProcSet
 
@@ -621,3 +622,34 @@ class TestAdd:
         with pytest.raises(ValueError):
             pset = ProcSet()
             pset.add((0, ))  # too few
+
+
+# pylint: disable=no-self-use,protected-access,too-many-public-methods
+class TestCopy:
+    def test_copy_empty(self):
+        pset = ProcSet()
+        copy_pset = copy.copy(pset)
+        assert copy_pset == pset
+        assert copy_pset is not pset
+        assert copy_pset._itvs is not pset._itvs
+
+    def test_copy_nonempty(self):
+        pset = ProcSet(ProcInt(0, 3))
+        copy_pset = copy.copy(pset)
+        assert copy_pset == pset
+        assert copy_pset is not pset
+        assert copy_pset._itvs is not pset._itvs
+
+    def test_deepcopy_empty(self):
+        pset = ProcSet()
+        copy_pset = copy.deepcopy(pset)
+        assert copy_pset == pset
+        assert copy_pset is not pset
+        assert copy_pset._itvs is not pset._itvs
+
+    def test_deepcopy_nonempty(self):
+        pset = ProcSet(ProcInt(0, 3))
+        copy_pset = copy.deepcopy(pset)
+        assert copy_pset == pset
+        assert copy_pset is not pset
+        assert copy_pset._itvs is not pset._itvs

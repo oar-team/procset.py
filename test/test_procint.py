@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright © 2017
+# Copyright © 2017, 2018
 # Contributed by Raphaël Bleuse <raphael.bleuse@imag.fr>
 #
 # This file is part of procset.py, a pure python module to manage sets of
@@ -19,6 +19,7 @@
 #   License version 3 along with this program.  If not, see
 #   <https://www.gnu.org/licenses/>.
 
+import copy
 import pytest
 from procset import ProcInt
 
@@ -98,3 +99,18 @@ class TestDisplay:
     def test_bad_format_spec(self):
         with pytest.raises(ValueError, match='^Invalid format specifier$'):
             format(ProcInt(0, 2), '--')
+
+
+# pylint: disable=no-self-use
+class TestCopy:
+    def test_copy(self):
+        itv = ProcInt(0, 0)
+        copy_itv = copy.copy(itv)
+        assert copy_itv == itv
+        assert copy_itv is not itv
+
+    def test_deepcopy(self):
+        itv = ProcInt(0, 0)
+        copy_itv = copy.deepcopy(itv)
+        assert copy_itv == itv
+        assert copy_itv is not itv
