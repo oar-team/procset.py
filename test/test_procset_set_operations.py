@@ -550,7 +550,7 @@ DIFFERENCE_TESTCASES = {
         0,
         ()
     ),
-    'firstempy_p': _TestCase(
+    'firstempty_p': _TestCase(
         """
                -∞....01234567....+∞
         left:  -∞................+∞
@@ -1059,7 +1059,7 @@ INTERSECTION_TESTCASES = {
         0,
         ()
     ),
-    'firstempy_p': _TestCase(
+    'firstempty_p': _TestCase(
         """
                -∞....01234567....+∞
         left:  -∞................+∞
@@ -1568,7 +1568,7 @@ SYMMETRIC_DIFFERENCE_TESTCASES = {
         1,
         (2, 3, 4, 5, )
     ),
-    'firstempy_p': _TestCase(
+    'firstempty_p': _TestCase(
         """
                -∞....01234567....+∞
         left:  -∞................+∞
@@ -2077,7 +2077,7 @@ UNION_TESTCASES = {
         1,
         (2, 3, 4, 5, )
     ),
-    'firstempy_p': _TestCase(
+    'firstempty_p': _TestCase(
         """
                -∞....01234567....+∞
         left:  -∞................+∞
