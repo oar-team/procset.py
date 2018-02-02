@@ -128,7 +128,7 @@ class ProcSet:
         """
         self._itvs = []  # list of disjoint intervals, in increasing order
         for itv in intervals:
-            self.add(itv)
+            self.insert(itv)
 
     @classmethod
     def from_str(cls, string, insep="-", outsep=" "):
@@ -148,10 +148,10 @@ class ProcSet:
             for itv in string.split(sep=outsep):
                 bounds = itv.split(sep=insep, maxsplit=1)
                 if len(bounds) == 1:
-                    new_pset.add(int(itv))
+                    new_pset.insert(int(itv))
                 else:
                     inf, sup = bounds
-                    new_pset.add(ProcInt(int(inf), int(sup)))
+                    new_pset.insert(ProcInt(int(inf), int(sup)))
         except ValueError:
             raise ValueError(
                 'Invalid interval format, parsed string is: {}'.format(string)
@@ -447,7 +447,7 @@ class ProcSet:
         self._itvs = list(self._merge(self, other, operator.xor))
         return self
 
-    def add(self, elem):
+    def insert(self, elem):
         """
         Insert elem into self.
 
@@ -465,7 +465,7 @@ class ProcSet:
             newinf, newsup = elem, elem  # if not, assume it is a single point
 
         # pylint: disable=protected-access
-        # Avoid infinite recursion by bypassing add(…) method and directly
+        # Avoid infinite recursion by bypassing insert(…) method and directly
         # setting new_pset._itvs
         new_pset = type(self)()
         new_pset._itvs = [ProcInt(newinf, newsup)]

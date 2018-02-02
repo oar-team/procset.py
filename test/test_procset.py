@@ -355,262 +355,262 @@ class TestDisplay:
 
 
 # pylint: disable=no-self-use,too-many-public-methods
-class TestAdd:
+class TestInsert:
     def test_empty(self):
         """
-        init:  -∞................+∞
-        add:   -∞....[______]....+∞
-        final: -∞....[______]....+∞
+        init:   -∞................+∞
+        insert: -∞....[______]....+∞
+        final:  -∞....[______]....+∞
         """
         pset = ProcSet()
-        pset.add(ProcInt(0, 7))
+        pset.insert(ProcInt(0, 7))
         assert len(pset) == 8
         assert pset.count() == 1
         assert list(pset) == [0, 1, 2, 3, 4, 5, 6, 7]
 
     def test_strict_subset(self):
         """
-        init:  -∞....[______]....+∞
-        add:   -∞......[]........+∞
-        final: -∞....[______]....+∞
+        init:   -∞....[______]....+∞
+        insert: -∞......[]........+∞
+        final:  -∞....[______]....+∞
         """
         pset = ProcSet(ProcInt(0, 7))
-        pset.add(ProcInt(2, 3))
+        pset.insert(ProcInt(2, 3))
         assert len(pset) == 8
         assert pset.count() == 1
         assert list(pset) == [0, 1, 2, 3, 4, 5, 6, 7]
 
     def test_strict_superset(self):
         """
-        init:  -∞......[]........+∞
-        add:   -∞....[______]....+∞
-        final: -∞....[______]....+∞
+        init:   -∞......[]........+∞
+        insert: -∞....[______]....+∞
+        final:  -∞....[______]....+∞
         """
         pset = ProcSet(ProcInt(2, 3))
-        pset.add(ProcInt(0, 7))
+        pset.insert(ProcInt(0, 7))
         assert len(pset) == 8
         assert pset.count() == 1
         assert list(pset) == [0, 1, 2, 3, 4, 5, 6, 7]
 
     def test_left_disjoint_notouch(self):
         """
-        init:  -∞........[__]....+∞
-        add:   -∞....[]..........+∞
-        final: -∞....[]..[__]....+∞
+        init:   -∞........[__]....+∞
+        insert: -∞....[]..........+∞
+        final:  -∞....[]..[__]....+∞
         """
         pset = ProcSet(ProcInt(4, 7))
-        pset.add(ProcInt(0, 1))
+        pset.insert(ProcInt(0, 1))
         assert len(pset) == 6
         assert pset.count() == 2
         assert list(pset) == [0, 1, 4, 5, 6, 7]
 
     def test_right_disjoint_notouch(self):
         """
-        init:  -∞....[__]........+∞
-        add:   -∞..........[]....+∞
-        final: -∞....[__]..[]....+∞
+        init:   -∞....[__]........+∞
+        insert: -∞..........[]....+∞
+        final:  -∞....[__]..[]....+∞
         """
         pset = ProcSet(ProcInt(0, 3))
-        pset.add(ProcInt(6, 7))
+        pset.insert(ProcInt(6, 7))
         assert len(pset) == 6
         assert pset.count() == 2
         assert list(pset) == [0, 1, 2, 3, 6, 7]
 
     def test_left_disjoint_touch(self):
         """
-        init:  -∞........[__]....+∞
-        add:   -∞......[]........+∞
-        final: -∞......[____]....+∞
+        init:   -∞........[__]....+∞
+        insert: -∞......[]........+∞
+        final:  -∞......[____]....+∞
         """
         pset = ProcSet(ProcInt(4, 7))
-        pset.add(ProcInt(2, 3))
+        pset.insert(ProcInt(2, 3))
         assert len(pset) == 6
         assert pset.count() == 1
         assert list(pset) == [2, 3, 4, 5, 6, 7]
 
     def test_right_disjoint_touch(self):
         """
-        init:  -∞....[__]........+∞
-        add:   -∞........[]......+∞
-        final: -∞....[____]......+∞
+        init:   -∞....[__]........+∞
+        insert: -∞........[]......+∞
+        final:  -∞....[____]......+∞
         """
         pset = ProcSet(ProcInt(0, 3))
-        pset.add(ProcInt(4, 5))
+        pset.insert(ProcInt(4, 5))
         assert len(pset) == 6
         assert pset.count() == 1
         assert list(pset) == [0, 1, 2, 3, 4, 5]
 
     def test_left_intersect(self):
         """
-        init:  -∞......[____]....+∞
-        add:   -∞....[____]......+∞
-        final: -∞....[______]....+∞
+        init:   -∞......[____]....+∞
+        insert: -∞....[____]......+∞
+        final:  -∞....[______]....+∞
         """
         pset = ProcSet(ProcInt(2, 7))
-        pset.add(ProcInt(0, 5))
+        pset.insert(ProcInt(0, 5))
         assert len(pset) == 8
         assert pset.count() == 1
         assert list(pset) == [0, 1, 2, 3, 4, 5, 6, 7]
 
     def test_right_intersect(self):
         """
-        init:  -∞....[____]......+∞
-        add:   -∞......[____]....+∞
-        final: -∞....[______]....+∞
+        init:   -∞....[____]......+∞
+        insert: -∞......[____]....+∞
+        final:  -∞....[______]....+∞
         """
         pset = ProcSet(ProcInt(0, 5))
-        pset.add(ProcInt(2, 7))
+        pset.insert(ProcInt(2, 7))
         assert len(pset) == 8
         assert pset.count() == 1
         assert list(pset) == [0, 1, 2, 3, 4, 5, 6, 7]
 
     def test_between_disjoint_notouch(self):
         """
-        init:  -∞....[]....[]....+∞
-        add:   -∞.......[].......+∞
-        final: -∞....[].[].[]....+∞
+        init:   -∞....[]....[]....+∞
+        insert: -∞.......[].......+∞
+        final:  -∞....[].[].[]....+∞
         """
         pset = ProcSet(ProcInt(0, 1), ProcInt(6, 7))
-        pset.add(ProcInt(3, 4))
+        pset.insert(ProcInt(3, 4))
         assert len(pset) == 6
         assert pset.count() == 3
         assert list(pset) == [0, 1, 3, 4, 6, 7]
 
     def test_between_disjoint_touch(self):
         """
-        init:  -∞....[]....[]....+∞
-        add:   -∞......[__]......+∞
-        final: -∞....[______]....+∞
+        init:   -∞....[]....[]....+∞
+        insert: -∞......[__]......+∞
+        final:  -∞....[______]....+∞
         """
         pset = ProcSet(ProcInt(0, 1), ProcInt(6, 7))
-        pset.add(ProcInt(2, 5))
+        pset.insert(ProcInt(2, 5))
         assert len(pset) == 8
         assert pset.count() == 1
         assert list(pset) == [0, 1, 2, 3, 4, 5, 6, 7]
 
     def test_between_intersect(self):
         """
-        init:  -∞....[_]..[_]....+∞
-        add:   -∞.....[___]......+∞
-        final: -∞....[______]....+∞
+        init:   -∞....[_]..[_]....+∞
+        insert: -∞.....[___]......+∞
+        final:  -∞....[______]....+∞
         """
         pset = ProcSet(ProcInt(0, 2), ProcInt(5, 7))
-        pset.add(ProcInt(1, 5))
+        pset.insert(ProcInt(1, 5))
         assert len(pset) == 8
         assert pset.count() == 1
         assert list(pset) == [0, 1, 2, 3, 4, 5, 6, 7]
 
     def test_superset_left_notouch(self):
         """
-        init:  -∞.....[]..[_]....+∞
-        add:   -∞....[_____].....+∞
-        final: -∞....[______]....+∞
+        init:   -∞.....[]..[_]....+∞
+        insert: -∞....[_____].....+∞
+        final:  -∞....[______]....+∞
         """
         pset = ProcSet(ProcInt(1, 2), ProcInt(5, 7))
-        pset.add(ProcInt(0, 6))
+        pset.insert(ProcInt(0, 6))
         assert len(pset) == 8
         assert pset.count() == 1
         assert list(pset) == [0, 1, 2, 3, 4, 5, 6, 7]
 
     def test_superset_left_touch(self):
         """
-        init:  -∞....[_]..[_]....+∞
-        add:   -∞....[_____].....+∞
-        final: -∞....[______]....+∞
+        init:   -∞....[_]..[_]....+∞
+        insert: -∞....[_____].....+∞
+        final:  -∞....[______]....+∞
         """
         pset = ProcSet(ProcInt(0, 2), ProcInt(5, 7))
-        pset.add(ProcInt(0, 6))
+        pset.insert(ProcInt(0, 6))
         assert len(pset) == 8
         assert pset.count() == 1
         assert list(pset) == [0, 1, 2, 3, 4, 5, 6, 7]
 
     def test_superset_right_notouch(self):
         """
-        init:  -∞....[_]..[].....+∞
-        add:   -∞.....[_____]....+∞
-        final: -∞....[______]....+∞
+        init:   -∞....[_]..[].....+∞
+        insert: -∞.....[_____]....+∞
+        final:  -∞....[______]....+∞
         """
         pset = ProcSet(ProcInt(0, 2), ProcInt(5, 6))
-        pset.add(ProcInt(1, 7))
+        pset.insert(ProcInt(1, 7))
         assert len(pset) == 8
         assert pset.count() == 1
         assert list(pset) == [0, 1, 2, 3, 4, 5, 6, 7]
 
     def test_superset_right_touch(self):
         """
-        init:  -∞....[_]..[_]....+∞
-        add:   -∞.....[_____]....+∞
-        final: -∞....[______]....+∞
+        init:   -∞....[_]..[_]....+∞
+        insert: -∞.....[_____]....+∞
+        final:  -∞....[______]....+∞
         """
         pset = ProcSet(ProcInt(0, 2), ProcInt(5, 7))
-        pset.add(ProcInt(1, 7))
+        pset.insert(ProcInt(1, 7))
         assert len(pset) == 8
         assert pset.count() == 1
         assert list(pset) == [0, 1, 2, 3, 4, 5, 6, 7]
 
     def test_englobing_superset(self):
         """
-        init:  -∞.....[].[]......+∞
-        add:   -∞....[_____].....+∞
-        final: -∞....[_____].....+∞
+        init:   -∞.....[].[]......+∞
+        insert: -∞....[_____].....+∞
+        final:  -∞....[_____].....+∞
         """
         pset = ProcSet(ProcInt(1, 2), ProcInt(4, 5))
-        pset.add(ProcInt(0, 6))
+        pset.insert(ProcInt(0, 6))
         assert len(pset) == 7
         assert pset.count() == 1
         assert list(pset) == [0, 1, 2, 3, 4, 5, 6]
 
     def test_left_disjoint_point_notouch(self):
         """
-        init:  -∞........[__]....+∞
-        add:   -∞....X...........+∞
-        final: -∞....X...[__]....+∞
+        init:   -∞........[__]....+∞
+        insert: -∞....X...........+∞
+        final:  -∞....X...[__]....+∞
         """
         pset = ProcSet(ProcInt(4, 7))
-        pset.add(ProcInt(0, 0))
+        pset.insert(ProcInt(0, 0))
         assert len(pset) == 5
         assert pset.count() == 2
         assert list(pset) == [0, 4, 5, 6, 7]
 
     def test_right_disjoint_point_notouch(self):
         """
-        init:  -∞....[__]........+∞
-        add:   -∞...........X....+∞
-        final: -∞....[__]...X....+∞
+        init:   -∞....[__]........+∞
+        insert: -∞...........X....+∞
+        final:  -∞....[__]...X....+∞
         """
         pset = ProcSet(ProcInt(0, 3))
-        pset.add(ProcInt(7, 7))
+        pset.insert(ProcInt(7, 7))
         assert len(pset) == 5
         assert pset.count() == 2
         assert list(pset) == [0, 1, 2, 3, 7]
 
     def test_left_disjoint_point_touch(self):
         """
-        init:  -∞........[__]....+∞
-        add:   -∞.......X........+∞
-        final: -∞.......[___]....+∞
+        init:   -∞........[__]....+∞
+        insert: -∞.......X........+∞
+        final:  -∞.......[___]....+∞
         """
         pset = ProcSet(ProcInt(4, 7))
-        pset.add(ProcInt(3, 3))
+        pset.insert(ProcInt(3, 3))
         assert len(pset) == 5
         assert pset.count() == 1
         assert list(pset) == [3, 4, 5, 6, 7]
 
     def test_right_disjoint_point_touch(self):
         """
-        init:  -∞....[__]........+∞
-        add:   -∞........X.......+∞
-        final: -∞....[___].......+∞
+        init:   -∞....[__]........+∞
+        insert: -∞........X.......+∞
+        final:  -∞....[___].......+∞
         """
         pset = ProcSet(ProcInt(0, 3))
-        pset.add(ProcInt(4, 4))
+        pset.insert(ProcInt(4, 4))
         assert len(pset) == 5
         assert pset.count() == 1
         assert list(pset) == [0, 1, 2, 3, 4]
 
     def test_single_point(self):
         pset = ProcSet()
-        pset.add(0)
+        pset.insert(0)
         assert len(pset) == 1
         assert pset.count() == 1
         assert list(pset) == [0]
@@ -618,10 +618,10 @@ class TestAdd:
     def test_incompatible_iter(self):
         with pytest.raises(ValueError):
             pset = ProcSet()
-            pset.add((0, 1, 2))  # too many
+            pset.insert((0, 1, 2))  # too many
         with pytest.raises(ValueError):
             pset = ProcSet()
-            pset.add((0, ))  # too few
+            pset.insert((0, ))  # too few
 
 
 # pylint: disable=no-self-use,protected-access,too-many-public-methods
