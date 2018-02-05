@@ -2,4 +2,4 @@
 Credits
 =======
 
-* Raphaël Bleuse <raphael.bleuse@imag.fr>
+* Raphaël Bleuse <raphael.bleuse@uni.lu>

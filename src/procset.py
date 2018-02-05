@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright © 2017, 2018
-# Contributed by Raphaël Bleuse <raphael.bleuse@imag.fr>
+# Contributed by Raphaël Bleuse <raphael.bleuse@uni.lu>
 #
 # This file is part of procset.py, a pure python module to manage sets of
 # closed intervals.
