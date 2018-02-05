@@ -469,6 +469,8 @@ class TestCopy:
         assert copy_pset == pset
         assert copy_pset is not pset
         assert copy_pset._itvs is not pset._itvs
+        pset |= ProcSet(ProcInt(128, 255))
+        assert copy_pset != pset
 
     def test_copy_nonempty(self):
         pset = ProcSet(ProcInt(0, 3))
@@ -476,17 +478,47 @@ class TestCopy:
         assert copy_pset == pset
         assert copy_pset is not pset
         assert copy_pset._itvs is not pset._itvs
+        pset |= ProcSet(ProcInt(128, 255))
+        assert copy_pset != pset
+
+    def test_copy_nested(self):
+        pset = ProcSet(ProcInt(0, 3))
+        nested = {0: pset, 1: [pset]}
+        copy_nested = copy.copy(nested)
+        assert copy_nested[0] == pset
+        assert copy_nested[0] is pset
+        assert copy_nested[0] == copy_nested[1][0]
+        assert copy_nested[0] is copy_nested[1][0]
+        pset |= ProcSet(ProcInt(128, 255))
+        assert copy_nested[0] == pset
+        assert copy_nested[0] == copy_nested[1][0]
 
     def test_deepcopy_empty(self):
         pset = ProcSet()
-        copy_pset = copy.deepcopy(pset)
-        assert copy_pset == pset
-        assert copy_pset is not pset
-        assert copy_pset._itvs is not pset._itvs
+        dcopy_pset = copy.deepcopy(pset)
+        assert dcopy_pset == pset
+        assert dcopy_pset is not pset
+        assert dcopy_pset._itvs is not pset._itvs
+        pset |= ProcSet(ProcInt(128, 255))
+        assert dcopy_pset != pset
 
     def test_deepcopy_nonempty(self):
         pset = ProcSet(ProcInt(0, 3))
-        copy_pset = copy.deepcopy(pset)
-        assert copy_pset == pset
-        assert copy_pset is not pset
-        assert copy_pset._itvs is not pset._itvs
+        dcopy_pset = copy.deepcopy(pset)
+        assert dcopy_pset == pset
+        assert dcopy_pset is not pset
+        assert dcopy_pset._itvs is not pset._itvs
+        pset |= ProcSet(ProcInt(128, 255))
+        assert dcopy_pset != pset
+
+    def test_deepcopy_nested(self):
+        pset = ProcSet(ProcInt(0, 3))
+        nested = {0: pset, 1: [pset]}
+        dcopy_nested = copy.deepcopy(nested)
+        assert dcopy_nested[0] == pset
+        assert dcopy_nested[0] is not pset
+        assert dcopy_nested[0] == dcopy_nested[1][0]
+        assert dcopy_nested[0] is dcopy_nested[1][0]
+        pset |= ProcSet(ProcInt(128, 255))
+        assert dcopy_nested[0] != pset
+        assert dcopy_nested[0] == dcopy_nested[1][0]
