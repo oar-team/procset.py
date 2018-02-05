@@ -393,6 +393,15 @@ class ProcSet:
 
     __copy__ = copy  # ensure compatibility with standard module copy
 
+    def __deepcopy__(self, memo):
+        # Optimized version of __deepcopy__ for ProcSet.
+        # /!\ This optimization is implementation specific /!\
+        # The classic __deepcopy__ implementation can be bypassed because a
+        # ProcInt is an immutable structure: there is no need to use the
+        # generic and complex implementation of deepcopy for tuples that may
+        # contain mutables.
+        return self.copy()
+
     def update(self, *others):
         raise NotImplementedError
 
