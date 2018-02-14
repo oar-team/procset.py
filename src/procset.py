@@ -218,7 +218,8 @@ class ProcSet:
         return self.count() <= 1
 
     def isdisjoint(self, other):
-        raise NotImplementedError
+        """Return True if self has no processor in common with other."""
+        return not bool(self & other)
 
     def issubset(self, other):
         raise NotImplementedError
