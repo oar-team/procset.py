@@ -219,7 +219,12 @@ class ProcSet:
 
     def isdisjoint(self, other):
         """Return True if self has no processor in common with other."""
-        return not bool(self & other)
+        # A naive implementation would test the truthiness of the intersection
+        # set.  However, one does not care about the intersection set.  It is
+        # sufficient to test if the generator returned by _merge_core is empty.
+        _sentinel = object()
+        _first = next(self._merge_core(self, other, operator.and_), _sentinel)
+        return _first is _sentinel
 
     def issubset(self, other):
         raise NotImplementedError
