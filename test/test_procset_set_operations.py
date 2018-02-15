@@ -29,8 +29,8 @@
 
 
 import collections
-import operator
 from procset import ProcSet
+import helpers
 
 
 ##### helper functions/classes #####
@@ -41,40 +41,36 @@ _TestCase = collections.namedtuple(
 )
 
 
-def build_test_class(name, operator, testcases, wrapper):
-    tests = {
-        'test_' + name: wrapper(testcase)
-        for name, testcase in testcases.items()
-    }
-    return type(name, (), dict(operator=operator, **tests))
-
-
-def build_merge_test(testcase):
-    def merge_test(self):
+def _build_merge_test(testcase):
+    def _merge_test(self):
         left_pset = ProcSet(*testcase.left)
         right_pset = ProcSet(*testcase.right)
-        res_pset = self.operator(left_pset, right_pset)
+
+        # apply merge method by name
+        res_pset = getattr(left_pset, self.method)(right_pset)
 
         # ensure we did not modify original operands
         assert left_pset == ProcSet(*testcase.left)
         assert right_pset == ProcSet(*testcase.right)
 
-        # check corectness of result
+        # check correctness of result
         assert len(res_pset) == testcase.expect_len
         assert res_pset.count() == testcase.expect_count
         assert tuple(res_pset) == testcase.expect_res
 
-    merge_test.__doc__ = testcase.doc
+    _merge_test.__doc__ = testcase.doc
 
-    return merge_test
+    return _merge_test
 
 
-def build_inplace_test(testcase):
-    def inplace_test(self):
+def _build_inplace_test(testcase):
+    def _inplace_test(self):
         left_pset = ProcSet(*testcase.left)
         left_orig = left_pset
         right_pset = ProcSet(*testcase.right)
-        left_pset = self.operator(left_pset, right_pset)
+
+        # apply merge method by name
+        left_pset = getattr(left_pset, self.method)(right_pset)
 
         # ensure we did not modify right operand
         assert right_pset == ProcSet(*testcase.right)
@@ -82,14 +78,14 @@ def build_inplace_test(testcase):
         # ensure we effectively modified in place the left operand
         assert left_pset is left_orig
 
-        # check corectness of result
+        # check correctness of result
         assert len(left_pset) == testcase.expect_len
         assert left_pset.count() == testcase.expect_count
         assert tuple(left_pset) == testcase.expect_res
 
-    inplace_test.__doc__ = testcase.doc
+    _inplace_test.__doc__ = testcase.doc
 
-    return inplace_test
+    return _inplace_test
 
 
 ##### testcases #####
@@ -2136,54 +2132,54 @@ UNION_TESTCASES = {
 
 # pylint: disable=invalid-name
 
-TestMergeDifference = build_test_class(
+TestMergeDifference = helpers.build_test_class(
     'TestMergeDifference',
-    operator.__sub__,
+    '__sub__',
     DIFFERENCE_TESTCASES,
-    build_merge_test
+    _build_merge_test
 )
-TestInPlaceDifference = build_test_class(
+TestInPlaceDifference = helpers.build_test_class(
     'TestInPlaceDifference',
-    operator.__isub__,
+    '__isub__',
     DIFFERENCE_TESTCASES,
-    build_inplace_test
+    _build_inplace_test
 )
 
-TestMergeIntersection = build_test_class(
+TestMergeIntersection = helpers.build_test_class(
     'TestMergeIntersection',
-    operator.__and__,
+    '__and__',
     INTERSECTION_TESTCASES,
-    build_merge_test
+    _build_merge_test
 )
-TestInPlaceIntersection = build_test_class(
+TestInPlaceIntersection = helpers.build_test_class(
     'TestInPlaceIntersection',
-    operator.__iand__,
+    '__iand__',
     INTERSECTION_TESTCASES,
-    build_inplace_test
+    _build_inplace_test
 )
 
-TestMergeSymmetricDifference = build_test_class(
+TestMergeSymmetricDifference = helpers.build_test_class(
     'TestMergeSymmetricDifference',
-    operator.__xor__,
+    '__xor__',
     SYMMETRIC_DIFFERENCE_TESTCASES,
-    build_merge_test
+    _build_merge_test
 )
-TestInPlaceSymmetricDifference = build_test_class(
+TestInPlaceSymmetricDifference = helpers.build_test_class(
     'TestInPlaceSymmetricDifference',
-    operator.__ixor__,
+    '__ixor__',
     SYMMETRIC_DIFFERENCE_TESTCASES,
-    build_inplace_test
+    _build_inplace_test
 )
 
-TestMergeUnion = build_test_class(
+TestMergeUnion = helpers.build_test_class(
     'TestMergeUnion',
-    operator.__or__,
+    '__or__',
     UNION_TESTCASES,
-    build_merge_test
+    _build_merge_test
 )
-TestInPlaceUnion = build_test_class(
+TestInPlaceUnion = helpers.build_test_class(
     'TestInPlaceUnion',
-    operator.__ior__,
+    '__ior__',
     UNION_TESTCASES,
-    build_inplace_test
+    _build_inplace_test
 )

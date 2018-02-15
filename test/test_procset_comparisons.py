@@ -27,7 +27,7 @@
 
 import collections
 from procset import ProcSet
-
+import helpers
 
 ##### helper functions/classes #####
 
@@ -37,15 +37,7 @@ _TestCase = collections.namedtuple(
 )
 
 
-def build_test_class(name, method, testcases, wrapper):
-    tests = {
-        'test_' + name: wrapper(testcase)
-        for name, testcase in testcases.items()
-    }
-    return type(name, (), dict(method=method, **tests))
-
-
-def build_comparison_test(testcase):
+def _build_comparison_test(testcase):
     def _comparison_test(self):
         left_pset = ProcSet(*testcase.left)
         right_pset = ProcSet(*testcase.right)
@@ -501,9 +493,9 @@ ISDISJOINT_TESTCASES = {
 
 # pylint: disable=invalid-name
 
-TestIsDisjoint = build_test_class(
+TestIsDisjoint = helpers.build_test_class(
     'TestIsDisjoint',
     'isdisjoint',
     ISDISJOINT_TESTCASES,
-    build_comparison_test
+    _build_comparison_test
 )

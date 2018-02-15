@@ -24,7 +24,7 @@ import pytest
 from procset import ProcInt, ProcSet
 
 
-# pylint: disable=no-self-use,too-many-public-methods
+# pylint: disable=no-self-use,too-many-public-methods,missing-docstring
 class TestNew:
     def test_empty(self):
         pset = ProcSet()
@@ -105,7 +105,7 @@ class TestNew:
             ProcSet(None)
 
 
-# pylint: disable=no-self-use,too-many-public-methods
+# pylint: disable=no-self-use,too-many-public-methods,missing-docstring
 class TestMisc:
     def test_equal(self):
         pset1 = ProcSet(ProcInt(0, 0))
@@ -255,7 +255,7 @@ class TestMisc:
         assert not ProcSet(0, (3, 5)).iscontiguous()
 
 
-# pylint: disable=no-self-use,too-many-public-methods
+# pylint: disable=no-self-use,too-many-public-methods,missing-docstring
 class TestStringParsing:
     def test_empty(self):
         pset = ProcSet.from_str('')
@@ -298,7 +298,7 @@ class TestStringParsing:
             ProcSet.from_str('1-2-3')
 
 
-# pylint: disable=no-self-use,too-many-public-methods
+# pylint: disable=no-self-use,too-many-public-methods,missing-docstring
 class TestDisplay:
     def test_empty(self):
         pset = ProcSet()
@@ -354,7 +354,7 @@ class TestDisplay:
             format(ProcSet(), ':--')
 
 
-# pylint: disable=no-self-use,too-many-public-methods
+# pylint: disable=no-self-use,too-many-public-methods,missing-docstring
 class TestInsert:
     def test_between_disjoint_notouch(self):
         """
@@ -461,7 +461,7 @@ class TestInsert:
             pset.insert((0, ))  # too few
 
 
-# pylint: disable=no-self-use,protected-access,too-many-public-methods
+# pylint: disable=no-self-use,protected-access,too-many-public-methods,missing-docstring
 class TestCopy:
     def test_copy_empty(self):
         pset = ProcSet()
