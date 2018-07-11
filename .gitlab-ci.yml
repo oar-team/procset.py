@@ -1,0 +1,10 @@
+image: python:3.6-slim-stretch
+
+before_script:
+  - pip install --upgrade --upgrade-strategy=eager pip setuptools wheel
+  - pip install -e .[test]
+
+pytest:
+  script:
+    - pytest --cov-report=term-missing
+  coverage: '/^TOTAL.+ ([1-9]?[0-9]%|100%)$/'
