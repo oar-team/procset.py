@@ -27,7 +27,7 @@ design choice has been made as procset aims at managing resources for
 scheduling. Hence, the manipulated intervals can be represented as indexes.
 """
 
-import operator
+import operator as _operator
 
 
 class ProcInt(tuple):
@@ -72,9 +72,9 @@ class ProcInt(tuple):
     def __contains__(self, item):
         return self.inf <= item <= self.sup
 
-    inf = property(operator.itemgetter(0), doc='Alias for field number 0')
+    inf = property(_operator.itemgetter(0), doc='Alias for field number 0')
 
-    sup = property(operator.itemgetter(1), doc='Alias for field number 1')
+    sup = property(_operator.itemgetter(1), doc='Alias for field number 1')
 
 
 class _Sentinel:
@@ -223,7 +223,7 @@ class ProcSet:
         # set.  However, one does not care about the intersection set.  It is
         # sufficient to test if the generator returned by _merge_core is empty.
         _sentinel = object()
-        _first = next(self._merge_core(self, other, operator.and_), _sentinel)
+        _first = next(self._merge_core(self, other, _operator.and_), _sentinel)
         return _first is _sentinel
 
     def issubset(self, other):
@@ -319,7 +319,7 @@ class ProcSet:
         # _itvs list. This is the same as ProcSet(*self._merge(…)), minus the
         # input validation step.
         result = type(self)()
-        result._itvs = list(self._merge(self, other, operator.or_))
+        result._itvs = list(self._merge(self, other, _operator.or_))
         return result
 
     def __eq__(self, other):
@@ -339,7 +339,7 @@ class ProcSet:
         # _itvs list. This is the same as ProcSet(*self._merge(…)), minus the
         # input validation step.
         result = type(self)()
-        result._itvs = list(self._merge(self, other, operator.and_))
+        result._itvs = list(self._merge(self, other, _operator.and_))
         return result
 
     def difference(self, *others):
@@ -381,7 +381,7 @@ class ProcSet:
         # _itvs list. This is the same as ProcSet(*self._merge(…)), minus the
         # input validation step.
         result = type(self)()
-        result._itvs = list(self._merge(self, other, operator.xor))
+        result._itvs = list(self._merge(self, other, _operator.xor))
         return result
 
     def copy(self):
@@ -416,7 +416,7 @@ class ProcSet:
         if not isinstance(other, type(self)):
             return NotImplemented
 
-        self._itvs = list(self._merge(self, other, operator.or_))
+        self._itvs = list(self._merge(self, other, _operator.or_))
         return self
 
     def intersection_update(self, *others):
@@ -429,7 +429,7 @@ class ProcSet:
         if not isinstance(other, type(self)):
             return NotImplemented
 
-        self._itvs = list(self._merge(self, other, operator.and_))
+        self._itvs = list(self._merge(self, other, _operator.and_))
         return self
 
     def difference_update(self, *others):
@@ -459,7 +459,7 @@ class ProcSet:
         if not isinstance(other, type(self)):
             return NotImplemented
 
-        self._itvs = list(self._merge(self, other, operator.xor))
+        self._itvs = list(self._merge(self, other, _operator.xor))
         return self
 
     def insert(self, elem):
