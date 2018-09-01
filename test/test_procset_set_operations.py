@@ -30,10 +30,7 @@
 
 import collections
 from procset import ProcSet
-import helpers
 
-
-##### helper functions/classes #####
 
 _TestCase = collections.namedtuple(
     '_TestCase',
@@ -41,13 +38,17 @@ _TestCase = collections.namedtuple(
 )
 
 
-def _build_merge_test(testcase):
-    def _merge_test(self):
+class _TestSetOperations:
+    testcases = None
+    merge_method = None
+    inplace_method = None
+
+    def test_merge(self, testcase):
         left_pset = ProcSet(*testcase.left)
         right_pset = ProcSet(*testcase.right)
 
         # apply merge method by name
-        res_pset = getattr(left_pset, self.method)(right_pset)
+        res_pset = getattr(left_pset, self.merge_method)(right_pset)
 
         # ensure we did not modify original operands
         assert left_pset == ProcSet(*testcase.left)
@@ -58,19 +59,13 @@ def _build_merge_test(testcase):
         assert res_pset.count() == testcase.expect_count
         assert tuple(res_pset) == testcase.expect_res
 
-    _merge_test.__doc__ = testcase.doc
-
-    return _merge_test
-
-
-def _build_inplace_test(testcase):
-    def _inplace_test(self):
+    def test_inplace(self, testcase):
         left_pset = ProcSet(*testcase.left)
         left_orig = left_pset
         right_pset = ProcSet(*testcase.right)
 
-        # apply merge method by name
-        left_pset = getattr(left_pset, self.method)(right_pset)
+        # apply inplace method by name
+        left_pset = getattr(left_pset, self.inplace_method)(right_pset)
 
         # ensure we did not modify right operand
         assert right_pset == ProcSet(*testcase.right)
@@ -83,12 +78,16 @@ def _build_inplace_test(testcase):
         assert left_pset.count() == testcase.expect_count
         assert tuple(left_pset) == testcase.expect_res
 
-    _inplace_test.__doc__ = testcase.doc
 
-    return _inplace_test
+# custom parametrization through the 'testcases' attribute:
+#   see https://docs.pytest.org/en/latest/example/parametrize.html#parametrizing-test-methods-through-per-class-configuration
+def pytest_generate_tests(metafunc):
+    paramsdict = metafunc.cls.testcases
+    ids, argvalues = zip(*paramsdict.items())  # ensure id matches its argvalue
+    metafunc.parametrize('testcase', argvalues, ids=ids)
 
 
-##### testcases #####
+# definition of test cases
 
 DIFFERENCE_TESTCASES = {
     'before_ii_notouch': _TestCase(
@@ -599,6 +598,8 @@ DIFFERENCE_TESTCASES = {
         ()
     ),
 }
+
+
 INTERSECTION_TESTCASES = {
     'before_ii_notouch': _TestCase(
         """
@@ -1108,6 +1109,8 @@ INTERSECTION_TESTCASES = {
         ()
     ),
 }
+
+
 SYMMETRIC_DIFFERENCE_TESTCASES = {
     'before_ii_notouch': _TestCase(
         """
@@ -1617,6 +1620,8 @@ SYMMETRIC_DIFFERENCE_TESTCASES = {
         ()
     ),
 }
+
+
 UNION_TESTCASES = {
     'before_ii_notouch': _TestCase(
         """
@@ -2128,58 +2133,27 @@ UNION_TESTCASES = {
 }
 
 
-#####  actual test classes  #####
+# link test cases to the actual methods
 
-# pylint: disable=invalid-name
+class TestDifference(_TestSetOperations):
+    testcases = DIFFERENCE_TESTCASES
+    merge_method = '__sub__'
+    inplace_method = '__isub__'
 
-TestMergeDifference = helpers.build_test_class(
-    'TestMergeDifference',
-    '__sub__',
-    DIFFERENCE_TESTCASES,
-    _build_merge_test
-)
-TestInPlaceDifference = helpers.build_test_class(
-    'TestInPlaceDifference',
-    '__isub__',
-    DIFFERENCE_TESTCASES,
-    _build_inplace_test
-)
 
-TestMergeIntersection = helpers.build_test_class(
-    'TestMergeIntersection',
-    '__and__',
-    INTERSECTION_TESTCASES,
-    _build_merge_test
-)
-TestInPlaceIntersection = helpers.build_test_class(
-    'TestInPlaceIntersection',
-    '__iand__',
-    INTERSECTION_TESTCASES,
-    _build_inplace_test
-)
+class TestIntersection(_TestSetOperations):
+    testcases = INTERSECTION_TESTCASES
+    merge_method = '__and__'
+    inplace_method = '__iand__'
 
-TestMergeSymmetricDifference = helpers.build_test_class(
-    'TestMergeSymmetricDifference',
-    '__xor__',
-    SYMMETRIC_DIFFERENCE_TESTCASES,
-    _build_merge_test
-)
-TestInPlaceSymmetricDifference = helpers.build_test_class(
-    'TestInPlaceSymmetricDifference',
-    '__ixor__',
-    SYMMETRIC_DIFFERENCE_TESTCASES,
-    _build_inplace_test
-)
 
-TestMergeUnion = helpers.build_test_class(
-    'TestMergeUnion',
-    '__or__',
-    UNION_TESTCASES,
-    _build_merge_test
-)
-TestInPlaceUnion = helpers.build_test_class(
-    'TestInPlaceUnion',
-    '__ior__',
-    UNION_TESTCASES,
-    _build_inplace_test
-)
+class TestSymmetricDifference(_TestSetOperations):
+    testcases = SYMMETRIC_DIFFERENCE_TESTCASES
+    merge_method = '__xor__'
+    inplace_method = '__ixor__'
+
+
+class TestUnion(_TestSetOperations):
+    testcases = UNION_TESTCASES
+    merge_method = '__or__'
+    inplace_method = '__ior__'

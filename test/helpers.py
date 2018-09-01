@@ -20,18 +20,10 @@
 #   <https://www.gnu.org/licenses/>.
 
 
-def build_test_class(name, method, testcases, wrapper):
-    """
-    Build a pytest test class for a given method and a set of testcases.
+import pytest
 
-    Build a pytest class with a test method for each testcase.  Given a dict of
-    testcases (each key identifies a testcase), this function create a method
-    out of testcase using wrapper.
 
-    See test_procset_comparisons.py for an example.
-    """
-    tests = {
-        'test_' + name: wrapper(testcase)
-        for name, testcase in testcases.items()
-    }
-    return type(name, (), dict(method=method, **tests))
+def dict_parametrize(argnames, paramsdict, indirect=False, scope=None):
+    """Decorator to parametrize test functions from a (id, argvalue) dict."""
+    ids, argvalues = zip(*paramsdict.items())  # ensure id matches its argvalue
+    return pytest.mark.parametrize(argnames, argvalues, indirect, ids, scope)
