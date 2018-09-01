@@ -26,8 +26,14 @@ from procset import ProcInt
 
 # pylint: disable=no-self-use,too-many-public-methods
 class TestNew:
-    def test_point(self):
+    def test_point_both(self):
         itv = ProcInt(0, 0)
+        assert itv == (0, 0)
+        assert len(itv) == 1
+        assert 0 in itv
+
+    def test_point_single(self):
+        itv = ProcInt(0)
         assert itv == (0, 0)
         assert len(itv) == 1
         assert 0 in itv
@@ -55,6 +61,10 @@ class TestNew:
     def test_bad_type_inf(self):
         with pytest.raises(TypeError, match='^ProcInt\(\) argument inf must be int$'):
             ProcInt('dummy string', 0)
+
+    def test_bad_type_inf_single(self):
+        with pytest.raises(TypeError, match='^ProcInt\(\) argument inf must be int$'):
+            ProcInt('dummy string')
 
     def test_bad_type_sup(self):
         with pytest.raises(TypeError, match='^ProcInt\(\) argument sup must be int$'):

@@ -35,10 +35,14 @@ class ProcInt(tuple):
 
     __slots__ = ()
 
-    def __new__(cls, inf, sup):
+    __NEW_SENTINEL = object()  # sentinel for optional sup
+
+    def __new__(cls, inf, sup=__NEW_SENTINEL):
         """Create new instance of ProcInt(inf, sup)."""
         if not isinstance(inf, int):
             raise TypeError('{}() argument inf must be int'.format(cls.__name__))
+        if sup is cls.__NEW_SENTINEL:
+            sup = inf
         if not isinstance(sup, int):
             raise TypeError('{}() argument sup must be int'.format(cls.__name__))
         if inf > sup:
@@ -146,12 +150,8 @@ class ProcSet:
 
         try:
             for itv in string.split(sep=outsep):
-                bounds = itv.split(sep=insep, maxsplit=1)
-                if len(bounds) == 1:
-                    new_pset.insert(int(itv))
-                else:
-                    inf, sup = bounds
-                    new_pset.insert(ProcInt(int(inf), int(sup)))
+                bounds = map(int, itv.split(sep=insep, maxsplit=1))
+                new_pset.insert(ProcInt(*bounds))
         except ValueError:
             raise ValueError(
                 'Invalid interval format, parsed string is: {}'.format(string)
