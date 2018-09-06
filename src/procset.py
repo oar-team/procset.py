@@ -189,7 +189,7 @@ class ProcSet:
         # as self._itvs is sorted in increasing order, we yield from the
         # reversed iterator
         for itv in reversed(self._itvs):
-            yield from range(itv.sup, itv.inf - 1, -1)
+            yield from reversed(range(itv.inf, itv.sup + 1))
 
     def __contains__(self, item):
         """Check if item is in self."""
