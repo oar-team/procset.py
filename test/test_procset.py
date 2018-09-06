@@ -522,3 +522,46 @@ class TestCopy:
         pset |= ProcSet(ProcInt(128, 255))
         assert dcopy_nested[0] != pset
         assert dcopy_nested[0] == dcopy_nested[1][0]
+
+
+# pylint: disable=no-self-use,too-many-public-methods,missing-docstring
+class TestGetItem:
+    INDEX_PSETS = (
+        ProcSet(ProcInt(0)),
+        ProcSet(ProcInt(0, 3)),
+        ProcSet(ProcInt(0, 3), ProcInt(8, 11)),
+        ProcSet(ProcInt(0, 1), ProcInt(3), ProcInt(6, 7)),
+        ProcSet(ProcInt(0, 3), ProcInt(8, 11), ProcInt(14, 15)),
+    )
+
+    def test_bad_key_type(self):
+        pset = ProcSet()
+        with pytest.raises(TypeError):
+            pset[None]
+
+    def test_empty(self):
+        pset = ProcSet()
+        with pytest.raises(IndexError):
+            pset[0]
+
+    @pytest.mark.parametrize('pset', INDEX_PSETS, ids=str)
+    def test_index_inrange(self, pset):
+        lpset = list(pset)
+        for i in range(len(pset)):
+            assert pset[i] == lpset[i]
+
+    @pytest.mark.parametrize('pset', INDEX_PSETS, ids=str)
+    def test_index_outofrange(self, pset):
+        with pytest.raises(IndexError):
+            pset[len(pset)]
+
+    @pytest.mark.parametrize('pset', INDEX_PSETS, ids=str)
+    def test_negative_index_inrange(self, pset):
+        lpset = list(pset)
+        for i in range(-len(pset), 0):
+            assert pset[i] == lpset[i]
+
+    @pytest.mark.parametrize('pset', INDEX_PSETS, ids=str)
+    def test_negative_index_outofrange(self, pset):
+        with pytest.raises(IndexError):
+            pset[-len(pset) - 1]

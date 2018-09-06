@@ -498,12 +498,31 @@ class ProcSet:
     def clear(self):
         raise NotImplementedError
 
-    def __getitem__(self, key):
-        raise NotImplementedError
+    def __getitem__(self, index):
+        if not isinstance(index, int):
+            raise TypeError(
+                '{} indices must be integers, not {}'.format(
+                    type(self).__name__,
+                    type(index).__name__
+                )
+            )
+        if index >= 0:
+            for itv in self._itvs:
+                if index < len(itv):
+                    return itv.inf + index
+                else:
+                    index -= len(itv)
+        else:
+            for itv in reversed(self._itvs):
+                if index >= -len(itv):
+                    return itv.sup + 1 + index
+                else:
+                    index += len(itv)
+        raise IndexError('{} index out of range'.format(type(self).__name__))
 
     # we do not define __setitem__ as it makes no sense to modify a processor
 
-    def __delitem__(self, key):
+    def __delitem__(self, index):
         raise NotImplementedError
 
     def aggregate(self):

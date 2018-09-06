@@ -65,7 +65,7 @@ https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range
 +--------+-------------------------------+-------------------------------------+
 | status | operation                     | comment                             |
 +========+===============================+=====================================+
-| ✗      | :py:`[i]`                     | implemented with :py:`__getitem__`, |
+| ✓      | :py:`[i]`                     | implemented with :py:`__getitem__`, |
 |        |                               | called with an :py:`int`            |
 +--------+-------------------------------+-------------------------------------+
 | ✗      | :py:`[i:j]`                   | implemented with :py:`__getitem__`, |
@@ -80,6 +80,12 @@ https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range
 | ✓      | :py:`s.max`                   | convex hull)                        |
 +--------+-------------------------------+-------------------------------------+
 
+.. note:: The semantic of :py:`__getitem__` and :py:`__delitem__` should behave
+          exactly as if we were dealing with a list of integers.  That is we
+          must enforce for a given :py:`ProcSet` :py:`p` that the following
+          snippets have the same semantic: :py:`p[i:j:k]` and
+          :py:`list(p)[i:j:k]`. A similar beavior is expected from
+          :py:`__delitem__`.
 
 Set-like operations
 -------------------
