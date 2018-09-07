@@ -145,7 +145,7 @@ class ProcSet:
         new_pset = cls()
 
         # empty string is parsed as empty ProcSet
-        if string == '':
+        if not string:
             return new_pset
 
         try:
