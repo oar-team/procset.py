@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-# Copyright © 2017
-# Contributed by Raphaël Bleuse <raphael.bleuse@uni.lu>
+# Copyright © 2017, 2019
+# Contributed by Raphaël Bleuse <cs@research.bleuse.net>
 #
 # This file is part of procset.py, a pure python module to manage sets of
 # closed intervals.
@@ -25,6 +25,7 @@ import intsetwrap as newapi
 
 
 # pylint: disable=no-self-use,too-many-public-methods
+@pytest.mark.filterwarnings("ignore:^Deprecated function:DeprecationWarning")
 class TestCompatibility:
     def test_itvs2str(self):
         new = newapi.interval_set_to_string([(1, 2), (5, 5), (10, 50)])
@@ -183,17 +184,23 @@ class TestCompatibility:
         old = oldapi.aggregate([(3, 4), (1, 2)])
         assert new == old
 
+DEPRECATED_CALLS = (
+    (newapi.interval_set_to_id_list, []),
+    (newapi.interval_set_to_set, []),
+    (newapi.set_to_interval_set, set()),
+    (newapi.id_list_to_iterval_set, list()),
+    (newapi.string_to_interval_set, ''),
+    (newapi.interval_set_to_string, []),
+    (newapi.total, []),
+    (newapi.equals, [], []),
+    (newapi.difference, [], []),
+    (newapi.intersection, [], []),
+    (newapi.union, [], []),
+    (newapi.aggregate, []),
+)
 
-def test_deprecation_warnings():
-    pytest.deprecated_call(newapi.interval_set_to_id_list, [])
-    pytest.deprecated_call(newapi.interval_set_to_set, [])
-    pytest.deprecated_call(newapi.set_to_interval_set, set())
-    pytest.deprecated_call(newapi.id_list_to_iterval_set, list())
-    pytest.deprecated_call(newapi.string_to_interval_set, '')
-    pytest.deprecated_call(newapi.interval_set_to_string, [])
-    pytest.deprecated_call(newapi.total, [])
-    pytest.deprecated_call(newapi.equals, [], [])
-    pytest.deprecated_call(newapi.difference, [], [])
-    pytest.deprecated_call(newapi.intersection, [], [])
-    pytest.deprecated_call(newapi.union, [], [])
-    pytest.deprecated_call(newapi.aggregate, [])
+@pytest.mark.parametrize('params', DEPRECATED_CALLS, ids=lambda t: t[0].__name__)
+def test_deprecation_warnings(params):
+    call, *args = params
+    with pytest.deprecated_call():
+        call(*args)
