@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-# Copyright © 2017, 2018
-# Contributed by Raphaël Bleuse <raphael.bleuse@uni.lu>
+# Copyright © 2017—2019
+# Contributed by Raphaël Bleuse <cs@research.bleuse.net>
 #
 # This file is part of procset.py, a pure python module to manage sets of
 # closed intervals.
@@ -154,7 +154,7 @@ class ProcSet:
                 new_pset.insert(ProcInt(*bounds))
         except ValueError:
             raise ValueError(
-                'Invalid interval format, parsed string is: {}'.format(string)
+                'Invalid interval format, parsed string is: \'{}\''.format(string)
             ) from None
 
         return new_pset

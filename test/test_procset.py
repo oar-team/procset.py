@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-# Copyright © 2017, 2018
-# Contributed by Raphaël Bleuse <raphael.bleuse@uni.lu>
+# Copyright © 2017—2019
+# Contributed by Raphaël Bleuse <cs@research.bleuse.net>
 #
 # This file is part of procset.py, a pure python module to manage sets of
 # closed intervals.
@@ -282,20 +282,14 @@ class TestStringParsing:
         assert pset == ProcSet(ProcInt(0, 3))
 
     def test_nostring(self):
-        with pytest.raises(TypeError, match='^from_str\(\) argument 2 must be str, not int$'):
+        with pytest.raises(TypeError, match=r'^from_str\(\) argument 2 must be str, not int$'):
             ProcSet.from_str(42)
 
-    def test_missing_left(self):
-        with pytest.raises(ValueError, match='^Invalid interval format, parsed string is: -1$'):
-            ProcSet.from_str('-1')
-
-    def test_missing_right(self):
-        with pytest.raises(ValueError, match='^Invalid interval format, parsed string is: 0-$'):
-            ProcSet.from_str('0-')
-
-    def test_many_contig(self):
-        with pytest.raises(ValueError, match='^Invalid interval format, parsed string is: 1-2-3$'):
-            ProcSet.from_str('1-2-3')
+    @pytest.mark.parametrize('string', ('-1', '0-', '1-2-3', ))
+    def test_invalid_string(self, string):
+        pattern = r'^Invalid interval format, parsed string is: \'{}\'$'.format(string)
+        with pytest.raises(ValueError, match=pattern):
+            ProcSet.from_str(string)
 
 
 # pylint: disable=no-self-use,too-many-public-methods,missing-docstring
