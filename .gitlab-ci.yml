@@ -6,8 +6,11 @@ before_script:
 .pytest:
   stage: test
   script:
-    - pytest --cov-report=term-missing
+    - pytest --cov-report=term-missing --junitxml=pytest.xml
   coverage: '/^TOTAL.+ ([1-9]?[0-9]%|100%)$/'
+  artifacts:
+    reports:
+      junit: pytest.xml
 
 pytest:3.7:
   extends: .pytest
