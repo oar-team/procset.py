@@ -24,6 +24,23 @@ import pytest
 from procset import ProcInt, ProcSet
 
 
+# used by {TestNew,TestInsert}::test_incompatible_iter_length
+INCOMPATIBLE_ITER_LENGTH_TESTCASES = (
+    (),  # length < 2
+    '',
+    (0, ),
+    '1',
+    (0, 1, 2, ),  # length > 2
+    '1-2',
+)
+# used by {TestNew,TestInsert}::test_incompatible_iter_type
+INCOMPATIBLE_ITER_TYPE_TESTCASES = (
+    '12',
+    ('0', 1),
+    (0, '1'),
+)
+
+
 # pylint: disable=no-self-use,too-many-public-methods,missing-docstring
 class TestNew:
     def test_empty(self):
@@ -69,10 +86,6 @@ class TestNew:
         assert len(pset) == 8
         assert pset.count() == 1
 
-    def test_bad_iter(self):
-        with pytest.raises(ValueError):
-            ProcSet([])
-
     def test_single_int(self):
         pset = ProcSet(0)
         assert list(pset) == [0]
@@ -91,14 +104,35 @@ class TestNew:
         assert len(pset) == 3
         assert pset.count() == 2
 
-    def test_incompatible_string(self):
-        # string are iterable but incompatible
-        with pytest.raises(ValueError):
-            ProcSet('1')  # caught because length < 1
-        with pytest.raises(TypeError):
-            ProcSet('12')  # caught because not an int
-        with pytest.raises(ValueError):
-            ProcSet('1-2')  # caught because length is > 2
+    def test_single_procset(self):
+        pset = ProcSet(ProcSet(0, (2, 3)))
+        assert list(pset) == [0, 2, 3]
+        assert len(pset) == 3
+        assert pset.count() == 2
+
+    def test_many_procsets(self):
+        pset = ProcSet(ProcSet(0, (3, 5)), ProcSet((2, 4)))
+        assert list(pset) == [0, 2, 3, 4, 5]
+        assert len(pset) == 5
+        assert pset.count() == 2
+
+    def test_mixed_int_procint_procset(self):
+        pset = ProcSet(0, (2, 6), ProcSet(3, (5, 7)))
+        assert list(pset) == [0, 2, 3, 4, 5, 6, 7]
+        assert len(pset) == 7
+        assert pset.count() == 2
+
+    @pytest.mark.parametrize('iterable', INCOMPATIBLE_ITER_LENGTH_TESTCASES, ids=repr)
+    def test_incompatible_iter_length(self, iterable):
+        pattern = '^Incompatible iterable, expected an iterable of exactly 2 int$'
+        with pytest.raises(TypeError, match=pattern):
+            ProcSet(iterable)
+
+    @pytest.mark.parametrize('iterable', INCOMPATIBLE_ITER_TYPE_TESTCASES, ids=repr)
+    def test_incompatible_iter_type(self, iterable):
+        pattern = r'^ProcInt\(\) argument (inf|sup) must be int$'
+        with pytest.raises(TypeError, match=pattern):
+            ProcSet(iterable)
 
     def test_bad_noiter(self):
         with pytest.raises(TypeError):
@@ -446,13 +480,26 @@ class TestInsert:
         assert pset.count() == 1
         assert list(pset) == [0, 1, 2, 3, 4, 5, 6]
 
-    def test_incompatible_iter(self):
-        with pytest.raises(ValueError):
+    @pytest.mark.parametrize('iterable', INCOMPATIBLE_ITER_LENGTH_TESTCASES, ids=repr)
+    def test_incompatible_iter_length(self, iterable):
+        pattern = '^Incompatible iterable, expected an iterable of exactly 2 int$'
+        with pytest.raises(TypeError, match=pattern):
             pset = ProcSet()
-            pset.insert((0, 1, 2))  # too many
-        with pytest.raises(ValueError):
+            pset.insert(iterable)
+
+    @pytest.mark.parametrize('iterable', INCOMPATIBLE_ITER_TYPE_TESTCASES, ids=repr)
+    def test_incompatible_iter_type(self, iterable):
+        pattern = r'^ProcInt\(\) argument (inf|sup) must be int$'
+        with pytest.raises(TypeError, match=pattern):
             pset = ProcSet()
-            pset.insert((0, ))  # too few
+            pset.insert(iterable)
+
+    @pytest.mark.parametrize('bad_pset', (ProcSet(0), ProcSet((0, 3)), ), ids=repr)
+    def test_bad_procset(self, bad_pset):
+        pattern = '^Incompatible iterable, expected an iterable of exactly 2 int$'
+        with pytest.raises(TypeError, match=pattern):
+            pset = ProcSet()
+            pset.insert(bad_pset)
 
 
 # pylint: disable=no-self-use,protected-access,too-many-public-methods,missing-docstring
@@ -538,24 +585,24 @@ class TestGetItem:
         with pytest.raises(IndexError):
             pset[0]
 
-    @pytest.mark.parametrize('pset', INDEX_PSETS, ids=str)
+    @pytest.mark.parametrize('pset', INDEX_PSETS, ids=repr)
     def test_index_inrange(self, pset):
         lpset = list(pset)
         for i in range(len(pset)):
             assert pset[i] == lpset[i]
 
-    @pytest.mark.parametrize('pset', INDEX_PSETS, ids=str)
+    @pytest.mark.parametrize('pset', INDEX_PSETS, ids=repr)
     def test_index_outofrange(self, pset):
         with pytest.raises(IndexError):
             pset[len(pset)]
 
-    @pytest.mark.parametrize('pset', INDEX_PSETS, ids=str)
+    @pytest.mark.parametrize('pset', INDEX_PSETS, ids=repr)
     def test_negative_index_inrange(self, pset):
         lpset = list(pset)
         for i in range(-len(pset), 0):
             assert pset[i] == lpset[i]
 
-    @pytest.mark.parametrize('pset', INDEX_PSETS, ids=str)
+    @pytest.mark.parametrize('pset', INDEX_PSETS, ids=repr)
     def test_negative_index_outofrange(self, pset):
         with pytest.raises(IndexError):
             pset[-len(pset) - 1]

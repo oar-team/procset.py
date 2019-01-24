@@ -117,10 +117,15 @@ class ProcSet:
 
         A ProcSet can be initialized with either nothing (empty set), any
         number of non-negative int, any number of ProcInt compatible objects
-        (iterable of exactly 2 int), or any combination of both.
+        (iterable of exactly 2 int), any number of ProcSet, or any combination
+        of such objects.
+
+        *New in version XXX:* __init__ accepts ProcSet objects.
 
         There are no restrictions on the domains of the intervals in the
         constructor: they may overlap.
+
+        The resulting ProcSet is the union of all intervals in the constructor.
 
         Examples:
             ProcSet()  # empty set
@@ -131,8 +136,8 @@ class ProcSet:
             ProcSet(ProcInt(0, 1), *[0, 3])  # mixing ProcInt and lists
         """
         self._itvs = []  # list of disjoint intervals, in increasing order
-        for itv in intervals:
-            self.insert(itv)
+        for new_itvs in map(self._as_itvs, intervals):
+            self._itvs = list(self._merge(self._itvs, new_itvs, _operator.or_))
 
     @classmethod
     def from_str(cls, string, insep="-", outsep=" "):
@@ -479,17 +484,7 @@ class ProcSet:
         If some processors already exist in self, they will not be added twice
         (hey this is a set!).
         """
-        try:
-            newinf, newsup = elem  # assume it is ProcInt compatible
-        except TypeError:
-            newinf, newsup = elem, elem  # if not, assume it is a single point
-
-        # Avoid infinite recursion by bypassing insert(…) method and directly
-        # setting new_pset._itvs
-        new_pset = type(self)()
-        # pylint: disable=protected-access
-        new_pset._itvs = [ProcInt(newinf, newsup)]
-        self |= new_pset
+        self._itvs = list(self._merge(self._itvs, self._as_procint(elem), _operator.or_))
 
     def remove(self, elem):
         raise NotImplementedError
@@ -562,3 +557,25 @@ class ProcSet:
             return self._itvs[-1].sup
         except IndexError:
             raise ValueError('Empty ProcSet') from None
+
+    @staticmethod
+    def _as_procint(elem):
+        """Yield elem as a ProcInt."""
+        try:  # ProcInt-compatible (iterable of exactly 2 int)
+            inf, sup = elem
+        except ValueError:
+            raise TypeError(
+                'Incompatible iterable, expected an iterable of exactly 2 int'
+            ) from None
+        except TypeError:  # single point (non-negative int)
+            inf, sup = elem, elem
+
+        yield ProcInt(inf, sup)
+
+    @classmethod
+    def _as_itvs(cls, other):
+        """Iterate over other as an _itvs list."""
+        if isinstance(other, cls):
+            yield from other._itvs
+        else:
+            yield from cls._as_procint(other)
