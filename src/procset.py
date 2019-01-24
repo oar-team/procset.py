@@ -142,22 +142,21 @@ class ProcSet:
                 'from_str() argument 2 must be str, not {}'.format(type(string).__name__)
             )
 
-        new_pset = cls()
-
         # empty string is parsed as empty ProcSet
         if not string:
-            return new_pset
+            return cls()
 
         try:
-            for itv in string.split(sep=outsep):
-                bounds = map(int, itv.split(sep=insep, maxsplit=1))
-                new_pset.insert(ProcInt(*bounds))
+            raw_bounds = (
+                map(int, itv.split(sep=insep, maxsplit=1))
+                for itv in string.split(sep=outsep)
+            )
+            intervals = (ProcInt(*bounds) for bounds in raw_bounds)
+            return cls(*intervals)
         except ValueError:
             raise ValueError(
                 'Invalid interval format, parsed string is: \'{}\''.format(string)
             ) from None
-
-        return new_pset
 
     def __str__(self):
         return format(self)
