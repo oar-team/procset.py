@@ -221,9 +221,10 @@ class ProcSet:
         """Return True if self has no processor in common with other."""
         # A naive implementation would test the truthiness of the intersection
         # set.  However, one does not care about the intersection set.  It is
-        # sufficient to test if the generator returned by _merge_core is empty.
+        # sufficient to test if the generator returned by _merge is empty.
         _sentinel = object()
-        _first = next(self._merge_core(self, other, _operator.and_), _sentinel)
+        # pylint: disable=protected-access
+        _first = next(self._merge(self._itvs, other._itvs, _operator.and_), _sentinel)
         return _first is _sentinel
 
     def issubset(self, other):
@@ -244,17 +245,18 @@ class ProcSet:
     def __gt__(self, other):
         raise NotImplementedError
 
-    def _flatten(self):
-        """Generate the (flat) list of interval bounds contained by self."""
-        for itv in self._itvs:
+    @staticmethod
+    def _flatten(itvs):
+        """Generate the (flat) list of interval bounds contained in itvs."""
+        for itv in itvs:
             # use inf as is
             yield False, itv.inf
             # convert sup, as merging operations are made with half-open
             # intervals
             yield True, itv.sup + 1
 
-    @staticmethod
-    def _merge_core(leftset, rightset, keeppredicate):
+    @classmethod
+    def _merge_core(cls, left_itvs, right_itvs, keeppredicate):
         """
         Generate the (flat) list of interval bounds of the requested merge.
 
@@ -264,8 +266,8 @@ class ProcSet:
         sentinel = _Sentinel()
 
         # pylint: disable=protected-access
-        lflat = leftset._flatten()
-        rflat = rightset._flatten()
+        lflat = cls._flatten(left_itvs)
+        rflat = cls._flatten(right_itvs)
         lend, lhead = next(lflat, (False, sentinel))
         rend, rhead = next(rflat, (False, sentinel))
 
@@ -286,7 +288,7 @@ class ProcSet:
             head = min(lhead, rhead)
 
     @classmethod
-    def _merge(cls, leftset, rightset, keeppredicate):
+    def _merge(cls, left_itvs, right_itvs, keeppredicate):
         """
         Generate the ProcInt list of the requested merge.
 
@@ -295,7 +297,7 @@ class ProcSet:
         See the difference(), intersection(), symmetric_difference(), and
         union() methods for an usage example.
         """
-        flat_merge = cls._merge_core(leftset, rightset, keeppredicate)
+        flat_merge = cls._merge_core(left_itvs, right_itvs, keeppredicate)
 
         # Note that we are feeding the same iterable twice to zip.
         # The iterated bounds are hence grouped by pairs (lower and upper
@@ -314,12 +316,12 @@ class ProcSet:
         if not isinstance(other, type(self)):
             return NotImplemented
 
-        # pylint: disable=protected-access
         # We directly assign result._itvs as self._merge(…) returns a valid
         # _itvs list. This is the same as ProcSet(*self._merge(…)), minus the
         # input validation step.
         result = type(self)()
-        result._itvs = list(self._merge(self, other, _operator.or_))
+        # pylint: disable=protected-access
+        result._itvs = list(self._merge(self._itvs, other._itvs, _operator.or_))
         return result
 
     def __eq__(self, other):
@@ -334,12 +336,12 @@ class ProcSet:
         if not isinstance(other, type(self)):
             return NotImplemented
 
-        # pylint: disable=protected-access
         # We directly assign result._itvs as self._merge(…) returns a valid
         # _itvs list. This is the same as ProcSet(*self._merge(…)), minus the
         # input validation step.
         result = type(self)()
-        result._itvs = list(self._merge(self, other, _operator.and_))
+        # pylint: disable=protected-access
+        result._itvs = list(self._merge(self._itvs, other._itvs, _operator.and_))
         return result
 
     def difference(self, *others):
@@ -352,14 +354,14 @@ class ProcSet:
         if not isinstance(other, type(self)):
             return NotImplemented
 
-        # pylint: disable=protected-access
         # We directly assign result._itvs as self._merge(…) returns a valid
         # _itvs list. This is the same as ProcSet(*self._merge(…)), minus the
         # input validation step.
         result = type(self)()
+        # pylint: disable=protected-access
         result._itvs = list(
             self._merge(
-                self, other,
+                self._itvs, other._itvs,
                 lambda inleft, inright: inleft and not inright
             )
         )
@@ -376,16 +378,15 @@ class ProcSet:
         if not isinstance(other, type(self)):
             return NotImplemented
 
-        # pylint: disable=protected-access
         # We directly assign result._itvs as self._merge(…) returns a valid
         # _itvs list. This is the same as ProcSet(*self._merge(…)), minus the
         # input validation step.
         result = type(self)()
-        result._itvs = list(self._merge(self, other, _operator.xor))
+        # pylint: disable=protected-access
+        result._itvs = list(self._merge(self._itvs, other._itvs, _operator.xor))
         return result
 
     def copy(self):
-        # pylint: disable=protected-access
         # We directly assign result._itvs as self._itvs is a valid list.  Note
         # that a ProcSet is nothing more than a container with some extra
         # methods, and a given structure.  As the current implementation relies
@@ -394,6 +395,7 @@ class ProcSet:
         # just a reference to self._itvs).  As _itvs is a list of ProcInt, a
         # shallow copy is the same as a deep copy.
         result = type(self)()
+        # pylint: disable=protected-access
         result._itvs = self._itvs.copy()
         return result
 
@@ -416,7 +418,8 @@ class ProcSet:
         if not isinstance(other, type(self)):
             return NotImplemented
 
-        self._itvs = list(self._merge(self, other, _operator.or_))
+        # pylint: disable=protected-access
+        self._itvs = list(self._merge(self._itvs, other._itvs, _operator.or_))
         return self
 
     def intersection_update(self, *others):
@@ -429,7 +432,8 @@ class ProcSet:
         if not isinstance(other, type(self)):
             return NotImplemented
 
-        self._itvs = list(self._merge(self, other, _operator.and_))
+        # pylint: disable=protected-access
+        self._itvs = list(self._merge(self._itvs, other._itvs, _operator.and_))
         return self
 
     def difference_update(self, *others):
@@ -440,9 +444,10 @@ class ProcSet:
         if not isinstance(other, type(self)):
             return NotImplemented
 
+        # pylint: disable=protected-access
         self._itvs = list(
             self._merge(
-                self, other,
+                self._itvs, other._itvs,
                 lambda inleft, inright: inleft and not inright
             )
         )
@@ -459,7 +464,8 @@ class ProcSet:
         if not isinstance(other, type(self)):
             return NotImplemented
 
-        self._itvs = list(self._merge(self, other, _operator.xor))
+        # pylint: disable=protected-access
+        self._itvs = list(self._merge(self._itvs, other._itvs, _operator.xor))
         return self
 
     def insert(self, elem):
@@ -479,10 +485,10 @@ class ProcSet:
         except TypeError:
             newinf, newsup = elem, elem  # if not, assume it is a single point
 
-        # pylint: disable=protected-access
         # Avoid infinite recursion by bypassing insert(…) method and directly
         # setting new_pset._itvs
         new_pset = type(self)()
+        # pylint: disable=protected-access
         new_pset._itvs = [ProcInt(newinf, newsup)]
         self |= new_pset
 
