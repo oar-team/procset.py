@@ -553,7 +553,7 @@ class ProcSet:
         try:
             return self._itvs[0].inf
         except IndexError:
-            raise ValueError('empty ProcSet') from None
+            raise ValueError('Empty ProcSet') from None
 
     @property
     def max(self):
@@ -561,4 +561,4 @@ class ProcSet:
         try:
             return self._itvs[-1].sup
         except IndexError:
-            raise ValueError('empty ProcSet') from None
+            raise ValueError('Empty ProcSet') from None

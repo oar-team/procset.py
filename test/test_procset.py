@@ -194,9 +194,9 @@ class TestMisc:
             assert proc not in pset
 
     def test_min_max_empty(self):
-        with pytest.raises(ValueError, match='^empty ProcSet$'):
+        with pytest.raises(ValueError, match='^Empty ProcSet$'):
             ProcSet().min
-        with pytest.raises(ValueError, match='^empty ProcSet$'):
+        with pytest.raises(ValueError, match='^Empty ProcSet$'):
             ProcSet().max
 
     def test_min_max_single_point(self):
