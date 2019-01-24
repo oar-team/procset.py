@@ -24,7 +24,7 @@ import interval_set.interval_set as oldapi
 import intsetwrap as newapi
 
 
-# pylint: disable=no-self-use,too-many-public-methods
+# pylint: disable=no-self-use,too-many-public-methods,missing-docstring
 @pytest.mark.filterwarnings("ignore:^Deprecated function:DeprecationWarning")
 class TestCompatibility:
     def test_itvs2str(self):

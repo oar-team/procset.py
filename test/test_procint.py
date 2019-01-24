@@ -24,7 +24,7 @@ import pytest
 from procset import ProcInt
 
 
-# pylint: disable=no-self-use,too-many-public-methods
+# pylint: disable=no-self-use,too-many-public-methods,missing-docstring
 class TestNew:
     def test_point_both(self):
         itv = ProcInt(0, 0)
@@ -53,21 +53,21 @@ class TestNew:
             assert point in itv
 
     def test_enforce_nonnegative(self):
-        with pytest.raises(ValueError, match='^Invalid negative bound\(s\)$'):
+        with pytest.raises(ValueError, match=r'^Invalid negative bound\(s\)$'):
             ProcInt(-1, 0)
-        with pytest.raises(ValueError, match='^Invalid negative bound\(s\)$'):
+        with pytest.raises(ValueError, match=r'^Invalid negative bound\(s\)$'):
             ProcInt(-15, -1)
 
     def test_bad_type_inf(self):
-        with pytest.raises(TypeError, match='^ProcInt\(\) argument inf must be int$'):
+        with pytest.raises(TypeError, match=r'^ProcInt\(\) argument inf must be int$'):
             ProcInt('dummy string', 0)
 
     def test_bad_type_inf_single(self):
-        with pytest.raises(TypeError, match='^ProcInt\(\) argument inf must be int$'):
+        with pytest.raises(TypeError, match=r'^ProcInt\(\) argument inf must be int$'):
             ProcInt('dummy string')
 
     def test_bad_type_sup(self):
-        with pytest.raises(TypeError, match='^ProcInt\(\) argument sup must be int$'):
+        with pytest.raises(TypeError, match=r'^ProcInt\(\) argument sup must be int$'):
             ProcInt(0, None)
 
     def test_bad_reversed_args(self):
