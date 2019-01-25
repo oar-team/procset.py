@@ -79,7 +79,8 @@ class _TestSetOperations:
         assert tuple(left_pset) == testcase.expect_res
 
 
-# custom parametrization through the 'testcases' attribute:
+# custom parametrization of fixture 'testcase' through the 'testcases' class
+# attribute:
 #   see https://docs.pytest.org/en/latest/example/parametrize.html#parametrizing-test-methods-through-per-class-configuration
 def pytest_generate_tests(metafunc):
     paramsdict = metafunc.cls.testcases

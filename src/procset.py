@@ -97,8 +97,7 @@ class _Sentinel:
     def __gt__(self, other):
         return True
 
-    def __ge__(self, other):
-        return True
+    __ge__ = __gt__
 
 
 class ProcSet:
@@ -109,7 +108,7 @@ class ProcSet:
     ProcInt.
     """
 
-    __slots__ = '_itvs'
+    __slots__ = ('_itvs', )
 
     def __init__(self, *intervals):
         """
@@ -579,6 +578,7 @@ class ProcSet:
     def _as_itvs(cls, other):
         """Iterate over other as an _itvs list."""
         if isinstance(other, cls):
+            # pylint: disable=protected-access
             yield from other._itvs
         else:
             yield from cls._as_procint(other)
