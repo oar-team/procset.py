@@ -213,6 +213,9 @@ class ProcSet:
         """Return the number of processors."""
         return sum(len(itv) for itv in self._itvs)
 
+    def __bool__(self):
+        return bool(self._itvs)
+
     def count(self):
         """Return the number of disjoint processors' intervals."""
         return len(self._itvs)

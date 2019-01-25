@@ -288,6 +288,12 @@ class TestMisc:
     def test_iscontiguous_mixed_points_intervals(self):
         assert not ProcSet(0, (3, 5)).iscontiguous()
 
+    def test_bool_empty(self):
+        assert not bool(ProcSet())
+
+    def test_bool_nonempty(self):
+        assert bool(ProcSet(0))
+
 
 # pylint: disable=no-self-use,too-many-public-methods,missing-docstring
 class TestStringParsing:
