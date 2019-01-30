@@ -208,12 +208,16 @@ class ProcSet:
                     low = mid + 1
         return False
 
-    def __len__(self):
-        """Return the number of processors."""
-        return sum(len(itv) for itv in self._itvs)
+    def __eq__(self, other):
+        # pylint: disable=protected-access
+        return self._itvs == other._itvs
 
     def __bool__(self):
         return bool(self._itvs)
+
+    def __len__(self):
+        """Return the number of processors."""
+        return sum(len(itv) for itv in self._itvs)
 
     def count(self):
         """Return the number of disjoint processors' intervals."""
@@ -225,6 +229,12 @@ class ProcSet:
 
     def isdisjoint(self, other):
         """Return True if self has no processor in common with other."""
+        if not isinstance(other, type(self)):
+            try:
+                other = type(self)(*other)
+            except TypeError:
+                return NotImplemented
+
         # A naive implementation would test the truthiness of the intersection
         # set.  However, one does not care about the intersection set.  It is
         # sufficient to test if the generator returned by _merge is empty.
@@ -233,23 +243,47 @@ class ProcSet:
         _first = next(self._merge(self._itvs, other._itvs, _operator.and_), _sentinel)
         return _first is _sentinel
 
+    def _issubset(self, other):
+        return self & other == self
+
     def issubset(self, other):
-        raise NotImplementedError
+        if not isinstance(other, type(self)):
+            try:
+                other = type(self)(*other)
+            except TypeError:
+                return NotImplemented
+        return self._issubset(other)
 
     def __le__(self, other):
-        raise NotImplementedError
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        return self._issubset(other)
 
     def __lt__(self, other):
-        raise NotImplementedError
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        return self._issubset(other) and self != other
 
     def issuperset(self, other):
-        raise NotImplementedError
+        if not isinstance(other, type(self)):
+            try:
+                other = type(self)(*other)
+            except TypeError:
+                return NotImplemented
+        # pylint: disable=protected-access
+        return other._issubset(self)
 
     def __ge__(self, other):
-        raise NotImplementedError
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        # pylint: disable=protected-access
+        return other._issubset(self)
 
     def __gt__(self, other):
-        raise NotImplementedError
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        # pylint: disable=protected-access
+        return other._issubset(self) and self != other
 
     @staticmethod
     def _flatten(itvs):
@@ -329,10 +363,6 @@ class ProcSet:
         # pylint: disable=protected-access
         result._itvs = list(self._merge(self._itvs, other._itvs, _operator.or_))
         return result
-
-    def __eq__(self, other):
-        # pylint: disable=protected-access
-        return self._itvs == other._itvs
 
     def intersection(self, *others):
         raise NotImplementedError
