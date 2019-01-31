@@ -349,7 +349,12 @@ class ProcSet:
             yield ProcInt(inf, sup - 1)  # convert back to closed intervals
 
     def union(self, *others):
-        raise NotImplementedError
+        """Return a new ProcSet with elements from self and all others."""
+        result = self.copy()
+        for other in map(self._as_itvs, others):
+            # pylint: disable=protected-access
+            result._itvs = list(result._merge(result._itvs, other, _operator.or_))
+        return result
 
     def __or__(self, other):
         """Return a new ProcSet with the intervals from self and other."""
@@ -365,7 +370,12 @@ class ProcSet:
         return result
 
     def intersection(self, *others):
-        raise NotImplementedError
+        """Return a new ProcSet with elements common to self and all others."""
+        result = self.copy()
+        for other in map(self._as_itvs, others):
+            # pylint: disable=protected-access
+            result._itvs = list(result._merge(result._itvs, other, _operator.and_))
+        return result
 
     def __and__(self, other):
         """Return a new ProcSet with the intervals common to self and other."""
@@ -380,8 +390,19 @@ class ProcSet:
         result._itvs = list(self._merge(self._itvs, other._itvs, _operator.and_))
         return result
 
+    @staticmethod
+    def _difference_operator(inleft, inright):
+        return inleft and not inright
+
     def difference(self, *others):
-        raise NotImplementedError
+        """
+        Return a new ProcSet with elements in self that are not in the others.
+        """
+        result = self.copy()
+        for other in map(self._as_itvs, others):
+            # pylint: disable=protected-access
+            result._itvs = list(result._merge(result._itvs, other, self._difference_operator))
+        return result
 
     def __sub__(self, other):
         """
@@ -396,15 +417,19 @@ class ProcSet:
         result = type(self)()
         # pylint: disable=protected-access
         result._itvs = list(
-            self._merge(
-                self._itvs, other._itvs,
-                lambda inleft, inright: inleft and not inright
-            )
+            self._merge(self._itvs, other._itvs, self._difference_operator)
         )
         return result
 
     def symmetric_difference(self, other):
-        raise NotImplementedError
+        """
+        Return a new ProcSet with elements in either self or other, but not
+        both.
+        """
+        result = type(self)()
+        # pylint: disable=protected-access
+        result._itvs = list(result._merge(self._itvs, self._as_itvs(other), _operator.xor))
+        return result
 
     def __xor__(self, other):
         """
@@ -447,7 +472,10 @@ class ProcSet:
         return self.copy()
 
     def update(self, *others):
-        raise NotImplementedError
+        """Update the ProcSet, adding elements from all others."""
+        for other in map(self._as_itvs, others):
+            self._itvs = list(self._merge(self._itvs, other, _operator.or_))
+        return self
 
     def __ior__(self, other):
         """Update the ProcSet, adding the intervals from other."""
@@ -459,7 +487,12 @@ class ProcSet:
         return self
 
     def intersection_update(self, *others):
-        raise NotImplementedError
+        """
+        Update the ProcSet, keeping only elements found in self and all others.
+        """
+        for other in map(self._as_itvs, others):
+            self._itvs = list(self._merge(self._itvs, other, _operator.and_))
+        return self
 
     def __iand__(self, other):
         """
@@ -473,7 +506,10 @@ class ProcSet:
         return self
 
     def difference_update(self, *others):
-        raise NotImplementedError
+        """Update the ProcSet, removing elements found in others."""
+        for other in map(self._as_itvs, others):
+            self._itvs = list(self._merge(self._itvs, other, self._difference_operator))
+        return self
 
     def __isub__(self, other):
         """Update the ProcSet, removing the intervals found in other."""
@@ -481,16 +517,16 @@ class ProcSet:
             return NotImplemented
 
         # pylint: disable=protected-access
-        self._itvs = list(
-            self._merge(
-                self._itvs, other._itvs,
-                lambda inleft, inright: inleft and not inright
-            )
-        )
+        self._itvs = list(self._merge(self._itvs, other._itvs, self._difference_operator))
         return self
 
     def symmetric_difference_update(self, other):
-        raise NotImplementedError
+        """
+        Update the ProcSet, keeping only elements found in either self or
+        other, but not in both.
+        """
+        self._itvs = list(self._merge(self._itvs, self._as_itvs(other), _operator.xor))
+        return self
 
     def __ixor__(self, other):
         """

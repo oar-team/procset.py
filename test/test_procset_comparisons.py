@@ -76,18 +76,18 @@ class _TestComparisonNonOperator(_TestComparison):
     valid_types = (
         # empty iterable
         set(),
-        [],
+        (),
         # Iterable[int]
         ProcSet(0),
         ProcInt(0),
         {0},
         pytest.param((i*i for i in range(4)), id='(i*i for i in range(4))'),
         # Iterable[ProcInt]
-        [ProcInt(0), ProcInt(1)],
+        (ProcInt(0), ProcInt(1)),
         # Iterable[ProcSet]
-        [ProcInt(0), ProcInt(1)],
+        (ProcSet(0), ProcSet(1)),
         # Iterable[Union[int, ProcInt, ProcSet]]
-        [0, ProcInt(1), ProcSet(2)],
+        (0, ProcInt(1), ProcSet(2)),
     )
     incompatible_types = (
         # not iterable
@@ -96,7 +96,7 @@ class _TestComparisonNonOperator(_TestComparison):
         # iterable of wrong type
         'bad-iterable',
         {None},
-        [0, ProcInt(1), None],
+        (0, ProcInt(1), None),
     )
 
 
@@ -107,29 +107,29 @@ class _TestComparisonOperator(_TestComparison):
     incompatible_types = (
         # empty iterable
         set(),
-        [],
+        (),
         # Iterable[int]
         ProcInt(0),
         {0},
         pytest.param((i*i for i in range(4)), id='(i*i for i in range(4))'),
         # Iterable[ProcInt]
-        [ProcInt(0), ProcInt(1)],
+        (ProcInt(0), ProcInt(1)),
         # Iterable[ProcSet]
-        [ProcInt(0), ProcInt(1)],
+        (ProcSet(0), ProcSet(1)),
         # Iterable[Union[int, ProcInt, ProcSet]]
-        [0, ProcInt(1), ProcSet(2)],
+        (0, ProcInt(1), ProcSet(2)),
         # not iterable
         None,
         0,
         # iterable of wrong type
         'bad-iterable',
         {None},
-        [0, ProcInt(1), None],
+        (0, ProcInt(1), None),
     )
 
 
 # late-binding of parametrization with class-scope fixtures
-#   see https://docs.pytest.org/en/latest/example/parametrize.html#parametrizing-test-methods-through-per-class-configuration
+# see https://docs.pytest.org/en/latest/example/parametrize.html#parametrizing-test-methods-through-per-class-configuration
 def pytest_generate_tests(metafunc):
     if 'testcase' in metafunc.fixturenames:
         paramsdict = COMPARISON_TESTCASES

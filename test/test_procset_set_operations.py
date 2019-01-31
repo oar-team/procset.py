@@ -29,7 +29,9 @@
 
 
 import collections
-from procset import ProcSet
+import itertools
+import pytest
+from procset import ProcInt, ProcSet
 
 
 _TestCase = collections.namedtuple(
@@ -38,10 +40,21 @@ _TestCase = collections.namedtuple(
 )
 
 
+def _powerset(*inputs):
+    s = list(inputs)
+    return list(
+        itertools.chain.from_iterable(
+            itertools.combinations(s, r) for r in range(len(s) + 1)
+        )
+    )
+
+
 class _TestSetOperations:
     testcases = None
     merge_method = None
     inplace_method = None
+    valid_types = None
+    incompatible_types = None
 
     def test_merge(self, testcase):
         left_pset = ProcSet(*testcase.left)
@@ -79,13 +92,106 @@ class _TestSetOperations:
         assert tuple(left_pset) == testcase.expect_res
 
 
-# custom parametrization of fixture 'testcase' through the 'testcases' class
-# attribute:
-#   see https://docs.pytest.org/en/latest/example/parametrize.html#parametrizing-test-methods-through-per-class-configuration
+class _TestSetOperationsNonOperator(_TestSetOperations):
+    valid_types = _powerset(
+        0,
+        ProcInt(1),
+        ProcSet(2),
+    )
+    incompatible_types = (
+        # not iterable
+        (None, ),
+        # iterable of wrong type
+        ('bad-iterable', ),
+        ((None, ), ),
+        ((0, ProcInt(1), None), ),
+    )
+
+    def test_valid_operand_type(self, method, valid):
+        pset = ProcSet()
+
+        # apply merge method by name
+        method = getattr(self, method)
+        result = getattr(pset, method)(*valid)
+
+        # check correctness of result
+        assert isinstance(result, ProcSet)
+
+    def test_incompatible_operand_type(self, method, incompatible):
+        pset = ProcSet()
+
+        # apply comparison method by name
+        method = getattr(self, method)
+
+        # check we properly raised
+        with pytest.raises(TypeError):
+            getattr(pset, method)(*incompatible)
+
+
+class _TestSetOperationsOperator(_TestSetOperations):
+    valid_types = (
+        ProcSet(0),
+    )
+    incompatible_types = (
+        # empty iterable
+        set(),
+        (),
+        # Iterable[int]
+        ProcInt(0),
+        {0},
+        pytest.param((i*i for i in range(4)), id='(i*i for i in range(4))'),
+        # Iterable[ProcInt]
+        (ProcInt(0), ProcInt(1)),
+        # Iterable[ProcSet]
+        (ProcSet(0), ProcSet(1)),
+        # Iterable[Union[int, ProcInt, ProcSet]]
+        (0, ProcInt(1), ProcSet(2)),
+        # not iterable
+        None,
+        0,
+        # iterable of wrong type
+        'bad-iterable',
+        {None},
+        (0, ProcInt(1), None),
+    )
+
+    def test_valid_operand_type(self, method, valid):
+        pset = ProcSet()
+
+        # apply merge method by name
+        method = getattr(self, method)
+        result = getattr(pset, method)(valid)
+
+        # check correctness of result
+        assert isinstance(result, ProcSet)
+
+    def test_incompatible_operand_type(self, method, incompatible):
+        pset = ProcSet()
+
+        # apply comparison method by name
+        method = getattr(self, method)
+        result = getattr(pset, method)(incompatible)
+
+        # check correctness of result
+        assert result is NotImplemented
+
+
+# late-binding of parametrization with class-scope fixtures
+# see https://docs.pytest.org/en/latest/example/parametrize.html#parametrizing-test-methods-through-per-class-configuration
 def pytest_generate_tests(metafunc):
-    paramsdict = metafunc.cls.testcases
-    ids, argvalues = zip(*paramsdict.items())  # ensure id matches its argvalue
-    metafunc.parametrize('testcase', argvalues, ids=ids)
+    if 'testcase' in metafunc.fixturenames:
+        paramsdict = metafunc.cls.testcases
+        ids, argvalues = zip(*paramsdict.items())  # {id: argvalue}, ensure id matches its argvalue
+        metafunc.parametrize('testcase', argvalues, ids=ids)
+    if 'method' in metafunc.fixturenames:
+        argvalues = ('merge_method', 'inplace_method', )
+        metafunc.parametrize('method', argvalues)
+    if 'valid' in metafunc.fixturenames:
+        argvalues = metafunc.cls.valid_types
+        metafunc.parametrize('valid', argvalues, ids=repr)
+    if 'incompatible' in metafunc.fixturenames:
+        argvalues = metafunc.cls.incompatible_types
+        metafunc.parametrize('incompatible', argvalues, ids=repr)
 
 
 # definition of test cases
@@ -2136,25 +2242,63 @@ UNION_TESTCASES = {
 
 # link test cases to the actual methods
 
-class TestDifference(_TestSetOperations):
+class TestDifference(_TestSetOperationsNonOperator):
+    testcases = DIFFERENCE_TESTCASES
+    merge_method = 'difference'
+    inplace_method = 'difference_update'
+
+
+class Test__SUB__(_TestSetOperationsOperator):
     testcases = DIFFERENCE_TESTCASES
     merge_method = '__sub__'
     inplace_method = '__isub__'
 
 
-class TestIntersection(_TestSetOperations):
+class TestIntersection(_TestSetOperationsNonOperator):
+    testcases = INTERSECTION_TESTCASES
+    merge_method = 'intersection'
+    inplace_method = 'intersection_update'
+
+
+class Test__AND__(_TestSetOperationsOperator):
     testcases = INTERSECTION_TESTCASES
     merge_method = '__and__'
     inplace_method = '__iand__'
 
 
-class TestSymmetricDifference(_TestSetOperations):
+class TestSymmetricDifference(_TestSetOperationsNonOperator):
+    testcases = SYMMETRIC_DIFFERENCE_TESTCASES
+    merge_method = 'symmetric_difference'
+    inplace_method = 'symmetric_difference_update'
+    # need to redefine valid_types/incompatible_types because of the method signature
+    valid_types = (
+        (0, ),
+        (ProcInt(1), ),
+        (ProcSet(2), ),
+    )
+    incompatible_types = (
+        # not iterable
+        (None, ),
+        # iterable of wrong type
+        ('bad-iterable', ),
+        ((None, ), ),
+        ((0, ProcInt(1), None), ),
+    )
+
+
+class Test__XOR__(_TestSetOperationsOperator):
     testcases = SYMMETRIC_DIFFERENCE_TESTCASES
     merge_method = '__xor__'
     inplace_method = '__ixor__'
 
 
-class TestUnion(_TestSetOperations):
+class TestUnion(_TestSetOperationsNonOperator):
+    testcases = UNION_TESTCASES
+    merge_method = 'union'
+    inplace_method = 'update'
+
+
+class Test__OR__(_TestSetOperationsOperator):
     testcases = UNION_TESTCASES
     merge_method = '__or__'
     inplace_method = '__ior__'
