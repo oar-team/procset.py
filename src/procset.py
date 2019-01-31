@@ -247,6 +247,7 @@ class ProcSet:
         return self & other == self
 
     def issubset(self, other):
+        """Test whether every element in self is in other."""
         if not isinstance(other, type(self)):
             try:
                 other = type(self)(*other)
@@ -255,16 +256,22 @@ class ProcSet:
         return self._issubset(other)
 
     def __le__(self, other):
+        """Test whether every element in self is in other."""
         if not isinstance(other, type(self)):
             return NotImplemented
         return self._issubset(other)
 
     def __lt__(self, other):
+        """
+        Test whether self is a proper subset of other, that is
+        self <= other and self != other.
+        """
         if not isinstance(other, type(self)):
             return NotImplemented
         return self._issubset(other) and self != other
 
     def issuperset(self, other):
+        """Test whether every element in other is in self."""
         if not isinstance(other, type(self)):
             try:
                 other = type(self)(*other)
@@ -274,12 +281,17 @@ class ProcSet:
         return other._issubset(self)
 
     def __ge__(self, other):
+        """Test whether every element in other is in self."""
         if not isinstance(other, type(self)):
             return NotImplemented
         # pylint: disable=protected-access
         return other._issubset(self)
 
     def __gt__(self, other):
+        """
+        Test whether self is a proper superset of other, that is
+        self >= other and self != other.
+        """
         if not isinstance(other, type(self)):
             return NotImplemented
         # pylint: disable=protected-access
@@ -448,6 +460,7 @@ class ProcSet:
         return result
 
     def copy(self):
+        """Return a shallow copy of self."""
         # We directly assign result._itvs as self._itvs is a valid list.  Note
         # that a ProcSet is nothing more than a container with some extra
         # methods, and a given structure.  As the current implementation relies
