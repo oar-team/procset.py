@@ -577,7 +577,7 @@ class ProcSet:
         raise NotImplementedError
 
     def clear(self):
-        raise NotImplementedError
+        self._itvs = []
 
     def __getitem__(self, index):
         if not isinstance(index, int):

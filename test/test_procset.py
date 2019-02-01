@@ -294,6 +294,11 @@ class TestMisc:
     def test_bool_nonempty(self):
         assert bool(ProcSet(0))
 
+    @pytest.mark.parametrize('pset', (ProcSet(), ProcSet(0), ProcSet(0, 2), ), ids=repr)
+    def test_clear(self, pset):
+        pset.clear()
+        assert pset == ProcSet()
+
 
 # pylint: disable=no-self-use,too-many-public-methods,missing-docstring
 class TestStringParsing:
