@@ -490,6 +490,8 @@ class ProcSet:
             self._itvs = list(self._merge(self._itvs, other, _operator.or_))
         return self
 
+    insert = update  # backward compatibility alias
+
     def __ior__(self, other):
         """Update the ProcSet, adding the intervals from other."""
         if not isinstance(other, type(self)):
@@ -524,6 +526,8 @@ class ProcSet:
             self._itvs = list(self._merge(self._itvs, other, self._difference_operator))
         return self
 
+    discard = difference_update  # convenience alias
+
     def __isub__(self, other):
         """Update the ProcSet, removing the intervals found in other."""
         if not isinstance(other, type(self)):
@@ -552,29 +556,6 @@ class ProcSet:
         # pylint: disable=protected-access
         self._itvs = list(self._merge(self._itvs, other._itvs, _operator.xor))
         return self
-
-    def insert(self, elem):
-        """
-        Insert elem into self.
-
-        It is assumed elem is ProcInt compatible (iterable of exactly 2 int),
-        or a single int.
-        In the first case, ProcInt(*elem) is added into self, in the latter
-        ProcInt(elem, elem) is added.
-
-        If some processors already exist in self, they will not be added twice
-        (hey this is a set!).
-        """
-        self._itvs = list(self._merge(self._itvs, self._as_procint(elem), _operator.or_))
-
-    def remove(self, elem):
-        raise NotImplementedError
-
-    def discard(self, elem):
-        raise NotImplementedError
-
-    def pop(self, elem):
-        raise NotImplementedError
 
     def clear(self):
         self._itvs = []
