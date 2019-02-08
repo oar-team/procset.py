@@ -582,7 +582,7 @@ class ProcSet:
                     index += len(itv)
         raise IndexError('{} index out of range'.format(type(self).__name__))
 
-    # we do not define __setitem__ as it makes no sense to modify a processor
+    __setitem__ = None  # it makes no sense to 'modify' a processor
 
     def __delitem__(self, index):
         raise NotImplementedError
