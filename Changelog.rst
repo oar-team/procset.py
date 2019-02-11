@@ -25,6 +25,7 @@ Added
 -----
 
 - Changelog
+- support of slices for :py:`ProcSet.__getitem__`
 
 
 1.0rc0_ -- 2019-02-07

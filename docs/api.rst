@@ -68,10 +68,10 @@ https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range
 | ✓      | :py:`[i]`                     | implemented with :py:`__getitem__`, |
 |        |                               | called with an :py:`int`            |
 +--------+-------------------------------+-------------------------------------+
-| ✗      | :py:`[i:j]`                   | implemented with :py:`__getitem__`, |
+| ✓      | :py:`[i:j]`                   | implemented with :py:`__getitem__`, |
 |        |                               | called with a :py:`slice`           |
 +--------+-------------------------------+                                     |
-| ✗      | :py:`[i:j:k]`                 |                                     |
+| ✓      | :py:`[i:j:k]`                 |                                     |
 +--------+-------------------------------+-------------------------------------+
 | ✗      | :py:`del s[i]`                | implemented with :py:`__delitem__`  |
 +--------+-------------------------------+-------------------------------------+
@@ -81,11 +81,13 @@ https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range
 +--------+-------------------------------+-------------------------------------+
 
 .. note:: The semantic of :py:`__getitem__` and :py:`__delitem__` should behave
-          exactly as if we were dealing with a list of integers.  That is we
-          must enforce for a given :py:`ProcSet` :py:`p` that the following
-          snippets have the same semantic: :py:`p[i:j:k]` and
-          :py:`list(p)[i:j:k]`. A similar beavior is expected from
-          :py:`__delitem__`.
+          exactly as if we were dealing with a list of integers.
+          That is we must enforce for a given :py:`ProcSet` :py:`p` that the
+          following snippets have the same semantic:
+            - :py:`p[i]` and :py:`list(p)[i]`.
+            - :py:`p[i:j:k]` and :py:`list(p)[i:j:k]`.
+
+          A similar behavior is expected from :py:`__delitem__`.
 
 Set-like operations
 -------------------

@@ -560,27 +560,63 @@ class ProcSet:
     def clear(self):
         self._itvs = []
 
-    def __getitem__(self, index):
-        if not isinstance(index, int):
-            raise TypeError(
-                '{} indices must be integers, not {}'.format(
-                    type(self).__name__,
-                    type(index).__name__
-                )
-            )
-        if index >= 0:
+    def __getitem_int(self, index):
+        assert isinstance(index, int)
+        cur = index
+        if cur >= 0:
             for itv in self._itvs:
-                if index < len(itv):
-                    return itv.inf + index
+                if cur < len(itv):
+                    return itv.inf + cur
                 else:
-                    index -= len(itv)
+                    cur -= len(itv)
         else:
             for itv in reversed(self._itvs):
-                if index >= -len(itv):
-                    return itv.sup + 1 + index
+                if cur >= -len(itv):
+                    return itv.sup + 1 + cur
                 else:
-                    index += len(itv)
+                    cur += len(itv)
         raise IndexError('{} index out of range'.format(type(self).__name__))
+
+    def __getitem_slice(self, index):
+        assert isinstance(index, slice)
+        cur, stop, step = index.indices(len(self))
+        result = []
+        if step > 0:
+            for itv in self._itvs:
+                if stop <= cur:  # early termination: no more matching items
+                    break
+                while cur < len(itv) and cur < stop:  # exhaust current itv
+                    result.append(itv.inf + cur)
+                    cur += step
+                # switch to new itv
+                cur -= len(itv)
+                stop -= len(itv)
+        else:
+            # work from end when step is negative
+            cur -= len(self)
+            stop -= len(self)
+            for itv in reversed(self._itvs):
+                if stop >= cur:  # early termination: no more matching items
+                    break
+                # account for current itv shift
+                cur += len(itv)
+                stop += len(itv)
+                while cur >= 0 and cur > stop:  # exhaust current itv
+                    result.append(itv.inf + cur)
+                    cur += step  # step is negative
+        return result
+
+    def __getitem__(self, index):
+        if isinstance(index, int):
+            return self.__getitem_int(index)
+        if isinstance(index, slice):
+            return self.__getitem_slice(index)
+        raise TypeError(
+            '{} indices must be integers or slices, not {}'.format(
+                type(self).__name__,
+                type(index).__name__
+            )
+        )
 
     __setitem__ = None  # it makes no sense to 'modify' a processor
 

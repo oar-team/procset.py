@@ -20,6 +20,7 @@
 #   <https://www.gnu.org/licenses/>.
 
 import copy
+import itertools
 import pytest
 from procset import ProcInt, ProcSet
 
@@ -458,42 +459,70 @@ class TestCopy:
 
 # pylint: disable=no-self-use,too-many-public-methods,missing-docstring
 class TestGetItem:
-    INDEX_PSETS = (
+    INT_INDEX_PSETS = (
         ProcSet(ProcInt(0)),
         ProcSet(ProcInt(0, 3)),
         ProcSet(ProcInt(0, 3), ProcInt(8, 11)),
         ProcSet(ProcInt(0, 1), ProcInt(3), ProcInt(6, 7)),
         ProcSet(ProcInt(0, 3), ProcInt(8, 11), ProcInt(14, 15)),
     )
+    SLICE_INDEX_PSETS = (  # interval lengths: latin square + relatively prime numbers
+        ProcSet(ProcInt(0, 3), ProcInt(5, 11)),
+        ProcSet(ProcInt(0, 6), ProcInt(8, 11)),
+        ProcSet(ProcInt(0), ProcInt(2, 5), ProcInt(7, 13)),
+        ProcSet(ProcInt(0, 3), ProcInt(5, 11), ProcInt(13)),
+        ProcSet(ProcInt(0, 6), ProcInt(8), ProcInt(10, 13)),
+        ProcSet(ProcInt(0, 2), ProcInt(4, 8), ProcInt(10, 16)),
+        ProcSet(ProcInt(0, 4), ProcInt(6, 12), ProcInt(14, 16)),
+        ProcSet(ProcInt(0, 6), ProcInt(8, 10), ProcInt(12, 16)),
+        ProcSet(ProcInt(0), ProcInt(2, 4), ProcInt(6, 10), ProcInt(12, 18)),
+        ProcSet(ProcInt(0, 2), ProcInt(4, 8), ProcInt(10, 16), ProcInt(18)),
+        ProcSet(ProcInt(0, 4), ProcInt(6, 12), ProcInt(14), ProcInt(16, 18)),
+        ProcSet(ProcInt(0, 6), ProcInt(8), ProcInt(10, 12), ProcInt(14, 18)),
+    )
+
 
     def test_bad_key_type(self):
         pset = ProcSet()
         with pytest.raises(TypeError):
             pset[None]
+        with pytest.raises(ValueError):
+            pset[::0]
 
     def test_empty(self):
         pset = ProcSet()
         with pytest.raises(IndexError):
             pset[0]
+        with pytest.raises(IndexError):
+            pset[-1]
 
-    @pytest.mark.parametrize('pset', INDEX_PSETS, ids=repr)
-    def test_index_inrange(self, pset):
+    @pytest.mark.parametrize('pset', INT_INDEX_PSETS, ids=repr)
+    def test_int_index_inrange(self, pset):
         lpset = list(pset)
         for i in range(len(pset)):
             assert pset[i] == lpset[i]
 
-    @pytest.mark.parametrize('pset', INDEX_PSETS, ids=repr)
-    def test_index_outofrange(self, pset):
+    @pytest.mark.parametrize('pset', INT_INDEX_PSETS, ids=repr)
+    def test_int_index_outofrange(self, pset):
         with pytest.raises(IndexError):
             pset[len(pset)]
 
-    @pytest.mark.parametrize('pset', INDEX_PSETS, ids=repr)
-    def test_negative_index_inrange(self, pset):
+    @pytest.mark.parametrize('pset', INT_INDEX_PSETS, ids=repr)
+    def test_negative_int_index_inrange(self, pset):
         lpset = list(pset)
         for i in range(-len(pset), 0):
             assert pset[i] == lpset[i]
 
-    @pytest.mark.parametrize('pset', INDEX_PSETS, ids=repr)
-    def test_negative_index_outofrange(self, pset):
+    @pytest.mark.parametrize('pset', INT_INDEX_PSETS, ids=repr)
+    def test_negative_int_index_outofrange(self, pset):
         with pytest.raises(IndexError):
             pset[-len(pset) - 1]
+
+    @pytest.mark.parametrize('pset', INT_INDEX_PSETS + SLICE_INDEX_PSETS, ids=repr)
+    def test_slice(self, pset):
+        starts = (None, ) + tuple(range(-len(pset) - 1, len(pset) + 2))
+        stops = starts
+        steps = (None, ) + tuple(range(-len(pset) - 1, 0)) + tuple(range(1, len(pset) + 2))
+
+        for start, stop, step in itertools.product(starts, stops, steps):
+            assert pset[start:stop:step] == list(pset)[start:stop:step]
