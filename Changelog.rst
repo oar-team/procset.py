@@ -21,6 +21,10 @@ This projects adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.ht
 Unreleased_
 ===========
 
+
+1.0rc1_ -- 2019-02-14
+=====================
+
 Added
 -----
 
@@ -203,7 +207,8 @@ Deprecated
 
 .. links to git diffs: https://{gitlab-project-url}/compare/{previous-tag}...{current-tag}
 
-.. _Unreleased: https://gitlab.inria.fr/bleuse/procset.py/compare/v1.0rc0...master
+.. _Unreleased: https://gitlab.inria.fr/bleuse/procset.py/compare/v1.0rc1...master
+.. _1.0rc1: https://gitlab.inria.fr/bleuse/procset.py/compare/v1.0rc0...v1.0rc1
 .. _1.0rc0: https://gitlab.inria.fr/bleuse/procset.py/compare/v0.4...v1.0rc0
 .. _0.4: https://gitlab.inria.fr/bleuse/procset.py/compare/v0.3...v0.4
 .. _0.3: https://gitlab.inria.fr/bleuse/procset.py/compare/v0.2...v0.3
