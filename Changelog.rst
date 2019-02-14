@@ -28,6 +28,13 @@ Added
 - support of slices for :py:`ProcSet.__getitem__`
 
 
+Changed
+-------
+
+- documentation is managed with sphinx, and published on Read the Docs
+
+
+
 1.0rc0_ -- 2019-02-07
 =====================
 

@@ -102,37 +102,22 @@ class _Sentinel:
 
 class ProcSet:
     """
-    A ProcSet is a set of non-overlapping ProcInt.
-
-    The current implementation uses a sorted list of ProcSet to store the
-    ProcInt.
+    Set of non-overlapping (i.e., disjoint) non-negative integer intervals.
     """
 
     __slots__ = ('_itvs', )
 
     def __init__(self, *intervals):
         """
-        Initialize a ProcSet.
-
         A ProcSet can be initialized with either nothing (empty set), any
-        number of non-negative int, any number of ProcInt compatible objects
-        (iterable of exactly 2 int), any number of ProcSet, or any combination
-        of such objects.
+        number of non-negative integer, any number of :class:`ProcInt`-compatible
+        iterable (iterable of exactly two :class:`int`), any number of ProcSet,
+        or any combination of such objects.
 
-        *New in version XXX:* __init__ accepts ProcSet objects.
-
-        There are no restrictions on the domains of the intervals in the
-        constructor: they may overlap.
-
-        The resulting ProcSet is the union of all intervals in the constructor.
-
-        Examples:
-            ProcSet()  # empty set
-            ProcSet(1)
-            ProcSet(ProcInt(0, 1))
-            ProcSet(ProcInt(0, 1), ProcInt(2, 3))
-            ProcSet((0, 1), [2, 3])  # identical to previous call
-            ProcSet(ProcInt(0, 1), *[0, 3])  # mixing ProcInt and lists
+        The resulting ProcSet is the union of all the intervals passed to the
+        constructor.
+        There is no restriction on the domains of the intervals passed to the
+        constructor: the domains may overlap.
         """
         self._itvs = []  # list of disjoint intervals, in increasing order
         for new_itvs in map(self._as_itvs, intervals):
@@ -140,7 +125,19 @@ class ProcSet:
 
     @classmethod
     def from_str(cls, string, insep="-", outsep=" "):
-        """Parse a string interval set representation into a ProcSet."""
+        """
+        Build a ProcSet from a string representation of an interval set.
+        The parsed string need not to be in canonical form.
+
+        :param str string: \
+            string representation to parse
+        :param str insep: \
+            delimiter character between the boundaries of a single interval
+            (defaults to ``-``, ascii dash symbol ``0x2d``)
+        :param str outsep: \
+            delimiter character between two intervals
+            (defaults to ``␣``, ascii space symbol ``0x20``)
+        """
         if not isinstance(string, str):
             raise TypeError(
                 'from_str() argument 2 must be str, not {}'.format(type(string).__name__)
@@ -182,20 +179,20 @@ class ProcSet:
         return '{}({})'.format(type(self).__name__, ', '.join(args))
 
     def __iter__(self):
-        """Iterate through the processors in self by increasing order."""
+        """Iterate over the processors in the ProcSet by increasing order."""
         # as self._itvs is sorted by increasing order, we can directly yield
         for itv in self._itvs:
             yield from range(itv.inf, itv.sup + 1)
 
     def __reversed__(self):
-        """Iterate through the processors in self by decreasing order."""
+        """Iterate over the processors in the ProcSet by decreasing order."""
         # as self._itvs is sorted in increasing order, we yield from the
         # reversed iterator
         for itv in reversed(self._itvs):
             yield from reversed(range(itv.inf, itv.sup + 1))
 
     def __contains__(self, item):
-        """Check if item is in self."""
+        """Check if item is in the ProcSet."""
         if self._itvs:
             low, high = 0, len(self._itvs)
             while low < high:
@@ -216,19 +213,21 @@ class ProcSet:
         return bool(self._itvs)
 
     def __len__(self):
-        """Return the number of processors."""
+        """Return the number of processors contained in the ProcSet."""
         return sum(len(itv) for itv in self._itvs)
 
     def count(self):
-        """Return the number of disjoint processors' intervals."""
+        """Return the number of disjoint intervals in the ProcSet."""
         return len(self._itvs)
 
     def iscontiguous(self):
-        """Return True if the processors form a single contiguous set."""
+        """Return ``True`` if the ProcSet is made of a unique interval."""
         return self.count() <= 1
 
     def isdisjoint(self, other):
-        """Return True if self has no processor in common with other."""
+        """
+        Return ``True`` if the ProcSet has no processor in common with *other*.
+        """
         if not isinstance(other, type(self)):
             try:
                 other = type(self)(*other)
@@ -247,7 +246,7 @@ class ProcSet:
         return self & other == self
 
     def issubset(self, other):
-        """Test whether every element in self is in other."""
+        """Test whether every element in the ProcSet is in *other*."""
         if not isinstance(other, type(self)):
             try:
                 other = type(self)(*other)
@@ -256,22 +255,22 @@ class ProcSet:
         return self._issubset(other)
 
     def __le__(self, other):
-        """Test whether every element in self is in other."""
+        """Test whether every element in the ProcSet is in *other*."""
         if not isinstance(other, type(self)):
             return NotImplemented
         return self._issubset(other)
 
     def __lt__(self, other):
         """
-        Test whether self is a proper subset of other, that is
-        self <= other and self != other.
+        Test whether the ProcSet is a proper subset of *other*, that is
+        ``self <= other`` and ``self != other``.
         """
         if not isinstance(other, type(self)):
             return NotImplemented
         return self._issubset(other) and self != other
 
     def issuperset(self, other):
-        """Test whether every element in other is in self."""
+        """Test whether every element in *other* is in the ProcSet."""
         if not isinstance(other, type(self)):
             try:
                 other = type(self)(*other)
@@ -281,7 +280,7 @@ class ProcSet:
         return other._issubset(self)
 
     def __ge__(self, other):
-        """Test whether every element in other is in self."""
+        """Test whether every element in *other* is in the ProcSet."""
         if not isinstance(other, type(self)):
             return NotImplemented
         # pylint: disable=protected-access
@@ -289,8 +288,8 @@ class ProcSet:
 
     def __gt__(self, other):
         """
-        Test whether self is a proper superset of other, that is
-        self >= other and self != other.
+        Test whether the ProcSet is a proper superset of *other*, that is
+        ``self >= other`` and ``self != other``.
         """
         if not isinstance(other, type(self)):
             return NotImplemented
@@ -361,7 +360,7 @@ class ProcSet:
             yield ProcInt(inf, sup - 1)  # convert back to closed intervals
 
     def union(self, *others):
-        """Return a new ProcSet with elements from self and all others."""
+        """Return a new ProcSet with elements from the ProcSet and all others."""
         result = self.copy()
         for other in map(self._as_itvs, others):
             # pylint: disable=protected-access
@@ -369,7 +368,7 @@ class ProcSet:
         return result
 
     def __or__(self, other):
-        """Return a new ProcSet with the intervals from self and other."""
+        """Return a new ProcSet with elements from the ProcSet and *other*."""
         if not isinstance(other, type(self)):
             return NotImplemented
 
@@ -382,7 +381,10 @@ class ProcSet:
         return result
 
     def intersection(self, *others):
-        """Return a new ProcSet with elements common to self and all others."""
+        """
+        Return a new ProcSet with elements common to the ProcSet and all
+        others.
+        """
         result = self.copy()
         for other in map(self._as_itvs, others):
             # pylint: disable=protected-access
@@ -390,7 +392,9 @@ class ProcSet:
         return result
 
     def __and__(self, other):
-        """Return a new ProcSet with the intervals common to self and other."""
+        """
+        Return a new ProcSet with elements common to the ProcSet and *other*.
+        """
         if not isinstance(other, type(self)):
             return NotImplemented
 
@@ -408,7 +412,8 @@ class ProcSet:
 
     def difference(self, *others):
         """
-        Return a new ProcSet with elements in self that are not in the others.
+        Return a new ProcSet with elements in the ProcSet that are not in the
+        others.
         """
         result = self.copy()
         for other in map(self._as_itvs, others):
@@ -418,7 +423,7 @@ class ProcSet:
 
     def __sub__(self, other):
         """
-        Return a new ProcSet with the intervals in self that are not in other.
+        Return a new ProcSet with elements in the ProcSet that are not in *other*.
         """
         if not isinstance(other, type(self)):
             return NotImplemented
@@ -435,8 +440,8 @@ class ProcSet:
 
     def symmetric_difference(self, other):
         """
-        Return a new ProcSet with elements in either self or other, but not
-        both.
+        Return a new ProcSet with elements in either the ProcSet or *other*,
+        but not in both.
         """
         result = type(self)()
         # pylint: disable=protected-access
@@ -445,8 +450,8 @@ class ProcSet:
 
     def __xor__(self, other):
         """
-        Return a new ProcSet with the intervals in either self or other, but
-        not both.
+        Return a new ProcSet with elements in either the ProcSet or *other*,
+        but not in both.
         """
         if not isinstance(other, type(self)):
             return NotImplemented
@@ -460,7 +465,7 @@ class ProcSet:
         return result
 
     def copy(self):
-        """Return a shallow copy of self."""
+        """Return a new ProcSet with a shallow copy of the ProcSet."""
         # We directly assign result._itvs as self._itvs is a valid list.  Note
         # that a ProcSet is nothing more than a container with some extra
         # methods, and a given structure.  As the current implementation relies
@@ -493,7 +498,7 @@ class ProcSet:
     insert = update  # backward compatibility alias
 
     def __ior__(self, other):
-        """Update the ProcSet, adding the intervals from other."""
+        """Update the ProcSet, adding elements from *other*."""
         if not isinstance(other, type(self)):
             return NotImplemented
 
@@ -503,7 +508,8 @@ class ProcSet:
 
     def intersection_update(self, *others):
         """
-        Update the ProcSet, keeping only elements found in self and all others.
+        Update the ProcSet, keeping only elements found in the ProcSet and all
+        others.
         """
         for other in map(self._as_itvs, others):
             self._itvs = list(self._merge(self._itvs, other, _operator.and_))
@@ -511,7 +517,7 @@ class ProcSet:
 
     def __iand__(self, other):
         """
-        Update the ProcSet, keeping only the intervals found in self and other.
+        Update the ProcSet, keeping only elements found in the ProcSet and *other*.
         """
         if not isinstance(other, type(self)):
             return NotImplemented
@@ -529,7 +535,7 @@ class ProcSet:
     discard = difference_update  # convenience alias
 
     def __isub__(self, other):
-        """Update the ProcSet, removing the intervals found in other."""
+        """Update the ProcSet, removing elements found in *other*."""
         if not isinstance(other, type(self)):
             return NotImplemented
 
@@ -539,16 +545,16 @@ class ProcSet:
 
     def symmetric_difference_update(self, other):
         """
-        Update the ProcSet, keeping only elements found in either self or
-        other, but not in both.
+        Update the ProcSet, keeping only elements found in either the ProcSet
+        or *other*, but not in both.
         """
         self._itvs = list(self._merge(self._itvs, self._as_itvs(other), _operator.xor))
         return self
 
     def __ixor__(self, other):
         """
-        Update the ProcSet, keeping only the intervals found in either self or
-        other, but not in both.
+        Update the ProcSet, keeping only elements found in either the ProcSet
+        or *other*, but not in both.
         """
         if not isinstance(other, type(self)):
             return NotImplemented
@@ -558,6 +564,7 @@ class ProcSet:
         return self
 
     def clear(self):
+        """Empty the ProcSet, removing all elements from it."""
         self._itvs = []
 
     def __getitem_int(self, index):
@@ -625,11 +632,13 @@ class ProcSet:
 
     def aggregate(self):
         """
-        Return the ProcSet that is the convex hull of self.
+        Return a new ProcSet that is the convex hull of the ProcSet.
 
-        If self is empty, its convex hull is the empty ProcSet.
-        If self is not empty, its convex hull is the ProcSet with the smallest
-        interval containing all intervals from self.
+        The convex hull of an empty ProcSet is the empty ProcSet.
+
+        The convex hull of a non-empty ProcSet is the contiguous ProcSet made
+        of the smallest unique interval containing all intervals from the
+        non-empty ProcSet.
         """
         if self._itvs:
             return type(self)(ProcInt(self.min, self.max))
@@ -637,12 +646,14 @@ class ProcSet:
             return type(self)()
 
     def intervals(self):
-        """Return an iterator on the intervals of self in increasing order."""
+        """
+        Return an iterator over the intervals of the ProcSet in increasing order.
+        """
         return iter(self._itvs)
 
     @property
     def min(self):
-        """The first processor in self (in increasing order)."""
+        """The first processor in the ProcSet (in increasing order)."""
         try:
             return self._itvs[0].inf
         except IndexError:
@@ -650,7 +661,7 @@ class ProcSet:
 
     @property
     def max(self):
-        """The last processor in self (in increasing order)."""
+        """The last processor in the ProcSet (in increasing order)."""
         try:
             return self._itvs[-1].sup
         except IndexError:

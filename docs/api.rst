@@ -1,255 +1,276 @@
-.. role:: py(code)
-   :language: python
+ProcSet API
+-----------
+
+.. currentmodule:: procset
 
 
-API description
-===============
+.. autoclass:: ProcSet
 
-This document describes the API for the :py:`ProcSet` class.
+   >>> ProcSet()  # empty set
+   ProcSet()
+   >>> ProcSet(1)
+   ProcSet(1)
+   >>> ProcSet(ProcInt(0, 1))
+   ProcSet((0, 1))
+   >>> ProcSet(ProcInt(0, 1), ProcInt(2, 3))
+   ProcSet((0, 3))
+   >>> ProcSet((0, 1), [2, 3])  # identical to previous call
+   ProcSet((0, 3))
+   >>> ProcSet(ProcInt(0, 1), *[0, 3])  # mixing ProcInt and lists
+   ProcSet((0, 1), 3)
 
-The implementation status is indicated by the bullet:
-  - ✗ means the method is not yet implemented,
-  - ✓ means the method is implemented,
-  - ✓✓ means the method is implemented and optimized.
+   **Implementation detail:**
+   A ProcSet is implemented as a sorted list of :class:`ProcInt`.
+   The memory complexity is hence linear in the number of disjoint intervals
+   contained in the set.
 
-
-Basic operations
-----------------
-
-+--------+------------------------------+--------------------------------------------------------------------------+
-| status | operation                    | comment                                                                  |
-+========+==============================+==========================================================================+
-| ✓      | :py:`str(s)`                 | implemented by :py:`__str__`                                             |
-+--------+------------------------------+--------------------------------------------------------------------------+
-| ✓      | :py:`repr(s)`                | - implemented by :py:`__repr__`                                          |
-|        |                              | - see https://docs.python.org/3/reference/datamodel.html#object.__repr__ |
-|        |                              |   for details about the expected behavior                                |
-+--------+------------------------------+--------------------------------------------------------------------------+
-| ✓      | :py:`format(s, format_spec)` | - implemented by :py:`__format__`                                        |
-|        |                              | - the defaults separators are:                                           |
-|        |                              |     - inner :py:`-`                                                      |
-|        |                              |     - outer :py:`␣` (space, ascii code `0x20`)                           |
-|        |                              | - the :py:`format_spec` is a string of length 2, where the inner         |
-|        |                              |   (resp. outer) separator is the first (resp. second) item               |
-|        |                              | - :py:`format(s, '')` matches the behavior of :py:`str` as recommended   |
-|        |                              |   in the documentation, see                                              |
-|        |                              |   https://docs.python.org/3/reference/datamodel.html#object.__str__      |
-+--------+------------------------------+--------------------------------------------------------------------------+
+   .. versionchanged:: 1.0
+      The constructor now supports ProcSet objects.
 
 
-Container-like operations
--------------------------
+   .. automethod:: from_str
 
-https://docs.python.org/3/reference/datamodel.html#emulating-container-types
+      >>> ProcSet.from_str('1-3 5 7')
+      ProcSet((1, 3), 5, 7)
+      >>> ProcSet.from_str('5 2-2 7 1-3')
+      ProcSet((1, 3), 5, 7)
+      >>> ProcSet.from_str('1:3,5,7', insep=':', outsep=',')
+      ProcSet((1, 3), 5, 7)
 
-+--------+-------------------------------+-------------------------------------+
-| status | operation                     | comment                             |
-+========+===============================+=====================================+
-| ✓      | :py:`len(s)`                  | implemented by :py:`__len__`        |
-+--------+-------------------------------+-------------------------------------+
-| ✓      | :py:`x in s`                  | implemented by :py:`__contains__`   |
-+--------+-------------------------------+                                     |
-| ✓      | :py:`x not in s`              |                                     |
-+--------+-------------------------------+-------------------------------------+
-| ✓      | :py:`iter(s)`                 | implemented by :py:`__iter__`       |
-+--------+-------------------------------+-------------------------------------+
-| ✓      | :py:`reversed(s)`             | implemented by :py:`__reversed__`   |
-+--------+-------------------------------+-------------------------------------+
+      .. note::
+         :meth:`from_str` only supports single character strings for ``insep``
+         and ``outsep`` delimiters.
 
 
-Sequence-like operations
-------------------------
+   .. describe:: str(pset)
+                 format(pset[, format_spec])
 
-https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range
+      Return the canonical string representation of *pset*.
 
-+--------+-------------------------------+-------------------------------------+
-| status | operation                     | comment                             |
-+========+===============================+=====================================+
-| ✓      | :py:`[i]`                     | implemented with :py:`__getitem__`, |
-|        |                               | called with an :py:`int`            |
-+--------+-------------------------------+-------------------------------------+
-| ✓      | :py:`[i:j]`                   | implemented with :py:`__getitem__`, |
-|        |                               | called with a :py:`slice`           |
-+--------+-------------------------------+                                     |
-| ✓      | :py:`[i:j:k]`                 |                                     |
-+--------+-------------------------------+-------------------------------------+
-| ✗      | :py:`del s[i]`                | implemented with :py:`__delitem__`  |
-+--------+-------------------------------+-------------------------------------+
-| ✓      | :py:`s.min`                   | provide fast access to extremal     |
-+--------+-------------------------------+ processors (i.e, bounds of the      |
-| ✓      | :py:`s.max`                   | convex hull)                        |
-+--------+-------------------------------+-------------------------------------+
+      When using :func:`str` or :func:`format` without *format_spec*, the
+      default delimiters are used (default inner delimiter is ``-``, default
+      outer delimiter is  ``␣``).
 
-.. note:: The semantic of :py:`__getitem__` and :py:`__delitem__` should behave
-          exactly as if we were dealing with a list of integers.
-          That is we must enforce for a given :py:`ProcSet` :py:`p` that the
-          following snippets have the same semantic:
-            - :py:`p[i]` and :py:`list(p)[i]`.
-            - :py:`p[i:j:k]` and :py:`list(p)[i:j:k]`.
+      When using :func:`format`, the parameter *format_spec* may be used to
+      change the delimiters.
+      The format specification is a length-2 string, where the first character
+      encodes the inner delimiter, and the second character encodes the outer
+      delimiter.
 
-          A similar behavior is expected from :py:`__delitem__`.
-
-Set-like operations
--------------------
-
-https://docs.python.org/3/library/stdtypes.html#set-types-set-frozenset
-
-Immutable sets operations
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-+--------+-----------------------------------+-------------------------------------+
-| status | operation                         | comment                             |
-+========+===================================+=====================================+
-| ✓      | :py:`isdisjoint(other)`           |                                     |
-+--------+-----------------------------------+-------------------------------------+
-| ✓      | :py:`issubset(other)`             | implemented by :py:`__le__`         |
-+--------+-----------------------------------+                                     |
-| ✓      | :py:`<= other`                    |                                     |
-+--------+-----------------------------------+-------------------------------------+
-| ✓      | :py:`< other`                     | implemented by :py:`__lt__`         |
-+--------+-----------------------------------+-------------------------------------+
-| ✓      | :py:`issuperset(other)`           | implemented by :py:`__ge__`         |
-+--------+-----------------------------------+                                     |
-| ✓      | :py:`>= other`                    |                                     |
-+--------+-----------------------------------+-------------------------------------+
-| ✓      | :py:`> other`                     | implemented by :py:`__gt__`         |
-+--------+-----------------------------------+-------------------------------------+
-| ✓      | :py:`== other`                    | implemented by :py:`__eq__`         |
-+--------+-----------------------------------+-------------------------------------+
-| ✓      | :py:`union(*others)`              | see :py:`| other | …`               |
-+--------+-----------------------------------+-------------------------------------+
-| ✓      | :py:`| other | …`                 | implemented by :py:`__or__`         |
-+--------+-----------------------------------+-------------------------------------+
-| ✓      | :py:`intersection(*others)`       | see :py:`& other & …`               |
-+--------+-----------------------------------+-------------------------------------+
-| ✓      | :py:`& other & …`                 | implemented by :py:`__and__`        |
-+--------+-----------------------------------+-------------------------------------+
-| ✓      | :py:`difference(*others)`         | see :py:`- other - …`               |
-+--------+-----------------------------------+-------------------------------------+
-| ✓      | :py:`- other - …`                 | implemented by :py:`__sub__`        |
-+--------+-----------------------------------+-------------------------------------+
-| ✓      | :py:`symmetric_difference(other)` | see :py:`^ other`                   |
-+--------+-----------------------------------+-------------------------------------+
-| ✓      | :py:`^ other`                     | implemented by :py:`__xor__`        |
-+--------+-----------------------------------+-------------------------------------+
-| ✓      | :py:`copy()`                      |                                     |
-+--------+-----------------------------------+-------------------------------------+
-| ✓      | :py:`deepcopy()`                  |                                     |
-+--------+-----------------------------------+-------------------------------------+
-
-Mutable sets operations
-^^^^^^^^^^^^^^^^^^^^^^^
-
-+--------+------------------------------------------+------------------------------------+
-| status | operation                                | comment                            |
-+========+==========================================+====================================+
-| ✓      | :py:`update(*others)`                    | see :py:`|= other | …`             |
-+--------+------------------------------------------+------------------------------------+
-| ✓      | :py:`|= other | …`                       | implemented by :py:`__ior__`       |
-+--------+------------------------------------------+------------------------------------+
-| ✓      | :py:`intersection_update(*others)`       | see :py:`&= other & …`             |
-+--------+------------------------------------------+------------------------------------+
-| ✓      | :py:`&= other & …`                       | implemented by :py:`__iand__`      |
-+--------+------------------------------------------+------------------------------------+
-| ✓      | :py:`difference_update(*others)`         | see :py:`-= other | …`             |
-+--------+------------------------------------------+------------------------------------+
-| ✓      | :py:`-= other | …`                       | implemented by :py:`__isub__`      |
-+--------+------------------------------------------+------------------------------------+
-| ✓      | :py:`symmetric_difference_update(other)` | implemented by :py:`__ixor__`      |
-+--------+------------------------------------------+                                    |
-| ✓      | :py:`^= other`                           |                                    |
-+--------+------------------------------------------+------------------------------------+
-| ✓      | :py:`insert(elem)`                       | alias of :py:`update()`            |
-+--------+------------------------------------------+------------------------------------+
-| ✓      | :py:`discard(elem)`                      | alias of :py:`difference_update()` |
-+--------+------------------------------------------+------------------------------------+
-| ✓      | :py:`clear()`                            |                                    |
-+--------+------------------------------------------+------------------------------------+
+      >>> pset = ProcSet((1, 3), 5, 7)
+      >>> str(pset)
+      '1-3 5 7'
+      >>> format(pset)
+      '1-3 5 7'
+      >>> format(pset, ':,')
+      '1:3,5,7'
 
 
-Specific operations
--------------------
+   .. describe:: i in pset
 
-+--------+-------------------------------+-------------------------------------+
-| status | operation                     | comment                             |
-+========+===============================+=====================================+
-| ✓      | :py:`iscontiguous()`          | empty set is considered contiguous  |
-+--------+-------------------------------+-------------------------------------+
-| ✓      | :py:`count()`                 | could add an optional parameter     |
-|        |                               | :py:`minlen=1`, to count only       |
-|        |                               | intervals of minimum length         |
-|        |                               | :py:`minlen`                        |
-+--------+-------------------------------+-------------------------------------+
-| ✓      | :py:`aggregate()`             |                                     |
-+--------+-------------------------------+-------------------------------------+
-| ✓      | :py:`intervals()`             |                                     |
-+--------+-------------------------------+-------------------------------------+
+      Test whether processor ``i`` is in *pset*.
+
+      >>> 3 in ProcSet((0, 7))
+      True
+      >>> 8 in ProcSet((0, 7))
+      False
 
 
-Deprecated API
-==============
+   .. describe:: len(pset)
 
-The module `interval_set` provided an API to manipulate intervals' sets. The
-new API of `procset` has been wrapped in the module `intsetwrap`. The
-corresponding new API is detailed in the table below.
+      Return the number of processors contained in *pset*.
 
-The module `intsetwrap` is intended as a temporary drop-in replacement to ease
-the migration.
-The module `intsetwrap` is planned for removal in the future major release, and
-the old API it exposes should not be used for new projects.
 
-+--------------------------------------+----------+--------------------------------+
-| old API functions                    | wrapped? | replacement                    |
-+======================================+==========+================================+
-| :py:`aggregate(itvs)`                |        ✓ | :py:`pset.aggregate()`         |
-+--------------------------------------+----------+--------------------------------+
-| :py:`difference(itvs1, itvs2)`       |        ✓ | :py:`pset1 - pset2`            |
-+--------------------------------------+----------+--------------------------------+
-| :py:`equals(itvs1, itvs2)`           |        ✓ | :py:`pset1 == pset2`           |
-+--------------------------------------+----------+--------------------------------+
-| :py:`id_list_to_iterval_set(idlist)` |        ✓ | :py:`ProcSet(*idlist)`         |
-+--------------------------------------+----------+--------------------------------+
-| :py:`intersection(itvs1, itvs2)`     |        ✓ | :py:`pset1 & pset2`            |
-+--------------------------------------+----------+--------------------------------+
-| :py:`interval_set_to_id_list(itvs)`  |        ✓ | :py:`list(pset)`               |
-+--------------------------------------+----------+--------------------------------+
-| :py:`interval_set_to_set(itvs)`      |        ✓ | :py:`set(pset)`                |
-+--------------------------------------+----------+--------------------------------+
-| :py:`interval_set_to_string(itvs)`   |        ✓ | :py:`str(pset)`,               |
-|                                      |          | :py:`format(pset)`             |
-+--------------------------------------+----------+--------------------------------+
-| :py:`set_to_interval_set(idset)`     |        ✓ | :py:`ProcSet(*idset)`          |
-+--------------------------------------+----------+--------------------------------+
-| :py:`string_to_interval_set(string)` |        ✓ | :py:`ProcSet.from_str(string)` |
-+--------------------------------------+----------+--------------------------------+
-| :py:`total(itvs)`                    |        ✓ | :py:`len(pset)`                |
-+--------------------------------------+----------+--------------------------------+
-| :py:`union(itvs1, itvs2)`            |        ✓ | :py:`pset1 | pset2`            |
-+--------------------------------------+----------+--------------------------------+
+   .. automethod:: count
 
-Deprecated API usage in evalys
-------------------------------
+      >>> pset = ProcSet((1, 3), 5, 7)
+      >>> len(pset)  # 5 processors
+      5
+      >>> pset.count()  # 3 disjoint intervals
+      3
 
-The comparison is made against commit d6d7234e51727adc0922b1df8826e5c6bd4b10ac.
 
-+------------------------------+-----------+----------+
-| old API function             | frequency | wrapped? |
-+==============================+===========+==========+
-| :py:`difference`             |         4 |        ✓ |
-+------------------------------+-----------+----------+
-| :py:`interval_set_to_set`    |         3 |        ✓ |
-+------------------------------+-----------+----------+
-| :py:`string_to_interval_set` |         3 |        ✓ |
-+------------------------------+-----------+----------+
-| :py:`intersection`           |         2 |        ✓ |
-+------------------------------+-----------+----------+
-| :py:`total`                  |         2 |        ✓ |
-+------------------------------+-----------+----------+
-| :py:`equals`                 |         1 |        ✓ |
-+------------------------------+-----------+----------+
-| :py:`interval_set_to_string` |         1 |        ✓ |
-+------------------------------+-----------+----------+
-| :py:`set_to_interval_set`    |         1 |        ✓ |
-+------------------------------+-----------+----------+
-| :py:`union`                  |         1 |        ✓ |
-+------------------------------+-----------+----------+
+   .. describe:: iter(pset)
+                 reversed(pset)
+
+      Iterate over the processors in *pset*.
+
+      >>> pset = ProcSet((1, 3), 5, 7)
+      >>> list(iter(pset))
+      [1, 2, 3, 5, 7]
+      >>> list(reversed(pset))
+      [7, 5, 3, 2, 1]
+
+
+   .. describe:: pset[i]
+                 pset[i:j]
+                 pset[i:j:k]
+
+      Access processors of *pset* by position.
+      ProcSet supports element index lookup, slicing and negative indices.
+
+      The semantic of the ``[]`` operator is defined to behave the same as if
+      *pset* was a list of integers.
+
+      When used with an :class:`int` ``i``, ``pset[i]`` returns the processor
+      at the i-th position.
+
+      When used with a :class:`slice`, ``pset[i:j:k]`` returns the
+      corresponding list of processors.
+
+      >>> pset = ProcSet(ProcInt(0), ProcInt(2, 5), ProcInt(7, 13))
+      >>> pset[0], pset[2], pset[-1]
+      (0, 3, 13)
+      >>> pset[1:5]
+      [2, 3, 4, 5]
+      >>> pset[:-3]
+      [0, 2, 3, 4, 5, 7, 8, 9, 10]
+      >>> pset[::2]
+      [0, 3, 5, 8, 10, 12]
+      >>> pset[3::3]
+      [4, 8, 11]
+      >>> pset[3::-3]
+      [4, 0]
+
+
+
+   .. automethod:: isdisjoint
+
+
+   .. method:: issubset(other)
+               pset <= other
+
+      Test whether every element in the ProcSet is in *other*.
+
+
+   .. method:: pset < other
+
+      Test whether the ProcSet is a proper subset of *other*, that is
+      ``pset <= other`` and ``pset != other``.
+
+
+   .. method:: issuperset(other)
+               pset >= other
+
+      Test whether every element in *other* is in the ProcSet.
+
+
+   .. method:: pset > other
+
+      Test whether the ProcSet is a proper superset of *other*, that is
+      ``pset >= other`` and ``pset != other``.
+
+
+   .. method:: union(*others)
+               pset | other | ...
+
+      Return a new ProcSet with elements from the ProcSet and all others.
+
+
+   .. method:: intersection(*others)
+               pset & other & ...
+
+      Return a new ProcSet with elements common to the ProcSet and all others.
+
+
+   .. method:: difference(*others)
+               pset - other - ...
+
+      Return a new ProcSet with elements in the ProcSet that are not in the
+      others.
+
+
+   .. method:: symmetric_difference(other)
+               pset ^ other
+
+      Return a new ProcSet with elements in either the ProcSet or *other*, but
+      not in both.
+
+
+   .. automethod:: copy
+
+
+   .. note::
+      The non-operator versions of :meth:`union`, :meth:`intersection`,
+      :meth:`difference`, :meth:`symmetric_difference` methods accept as
+      argument any combination of objects that may be used to initialize a
+      ProcSet.
+
+      In contrast, their operator based counterparts require their arguments to
+      be ProcSet.
+      This avoid error-prone constructions, and favors readability.
+
+
+   .. method:: update(*others)
+               insert(*others)
+               pset |= other | ...
+
+      Update the ProcSet, adding elements from all others.
+
+
+   .. method:: intersection_update(*others)
+               pset &= other & ...
+
+      Update the ProcSet, keeping only elements found in the ProcSet and all
+      others.
+
+
+   .. method:: difference_update(*others)
+               discard(*others)
+               pset -= other | ...
+
+      Update the ProcSet, removing elements found in others.
+
+
+   .. method:: symmetric_difference_update(other)
+               pset ^= other
+
+      Update the ProcSet, keeping only elements found in either the ProcSet or
+      *other*, but not in both.
+
+
+   .. automethod:: clear
+
+
+   .. note::
+      The non-operator versions of :meth:`update`, :meth:`intersection_update`,
+      :meth:`difference_update`, :meth:`symmetric_difference_update` methods
+      accept as argument any combination of objects that may be used to
+      initialize a ProcSet.
+
+      In contrast, their operator based counterparts require their arguments to
+      be ProcSet.
+      This avoid error-prone constructions, and favors readability.
+
+
+   .. automethod:: iscontiguous
+
+      >>> ProcSet().iscontiguous()
+      True
+      >>> ProcSet((1, 3)).iscontiguous()
+      True
+      >>> ProcSet((1, 3), 4).iscontiguous()
+      True
+      >>> ProcSet((1, 3), 5, 7).iscontiguous()
+      False
+
+
+   .. automethod:: aggregate
+
+      >>> ProcSet().aggregate()
+      ProcSet()
+      >>> ProcSet((1, 3), 5, 7).aggregate()
+      ProcSet((1, 7))
+
+
+   .. automethod:: intervals
+
+      >>> pset = ProcSet((1, 3), 5)
+      >>> list(pset.intervals())
+      [ProcInt(inf=1, sup=3), ProcInt(inf=5, sup=5)]
+
+
+   .. autoattribute:: min
+
+
+   .. autoattribute:: max
