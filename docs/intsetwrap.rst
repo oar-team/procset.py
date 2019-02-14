@@ -1,5 +1,5 @@
 Migrating :mod:`interval_set`
------------------------------
+=============================
 
 The module :mod:`interval_set` provided a crude API to manipulate interval
 sets.

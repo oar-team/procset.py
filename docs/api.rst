@@ -1,5 +1,5 @@
 ProcSet API
------------
+===========
 
 .. currentmodule:: procset
 

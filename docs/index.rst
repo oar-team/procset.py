@@ -1,6 +1,5 @@
-=======
-procset
-=======
+Overview
+========
 
 .. toctree::
    :hidden:

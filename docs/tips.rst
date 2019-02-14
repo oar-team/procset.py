@@ -1,8 +1,8 @@
 Tips & Tricks
--------------
+=============
 
 Scaling a :class:`~procset.ProcSet`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------------------
 
 Assuming a :class:`~procset.ProcSet` represents a set of processors with many
 cores, one may create the set of cores with the following snippet:
@@ -19,7 +19,7 @@ cores, one may create the set of cores with the following snippet:
 
 
 Dumping to JSON
-^^^^^^^^^^^^^^^
+---------------
 
 The :class:`~procset.ProcSet` object does not provide a JSON serialization
 method.
