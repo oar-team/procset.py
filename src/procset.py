@@ -62,13 +62,12 @@ class ProcInt(tuple):
         return format(self)
 
     def __format__(self, format_spec):
+        if len(format_spec) > 1:
+            raise ValueError('Invalid format specifier')
         if self.inf == self.sup:
             return str(self.inf)
-        else:
-            if len(format_spec) > 1:
-                raise ValueError('Invalid format specifier')
-            insep = format_spec or '-'
-            return insep.join(map(str, self))
+        insep = format_spec or '-'
+        return insep.join(map(str, self))
 
     def __len__(self):
         return self.sup - self.inf + 1
@@ -574,14 +573,12 @@ class ProcSet:
             for itv in self._itvs:
                 if cur < len(itv):
                     return itv.inf + cur
-                else:
-                    cur -= len(itv)
+                cur -= len(itv)
         else:
             for itv in reversed(self._itvs):
                 if cur >= -len(itv):
                     return itv.sup + 1 + cur
-                else:
-                    cur += len(itv)
+                cur += len(itv)
         raise IndexError('{} index out of range'.format(type(self).__name__))
 
     def __getitem_slice(self, index):
@@ -642,8 +639,7 @@ class ProcSet:
         """
         if self._itvs:
             return type(self)(ProcInt(self.min, self.max))
-        else:
-            return type(self)()
+        return type(self)()
 
     def intervals(self):
         """
