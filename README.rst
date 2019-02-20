@@ -31,3 +31,29 @@ Requirements
 ------------
 
 - `setuptools>=34.4.0`
+
+
+Example use
+-----------
+
+What does it look like to use ``procset``?  Here is a simple example program:
+
+.. code:: python
+
+   from procset import ProcSet
+
+
+   free_cores = ProcSet((0, 7))  # I have 8 cores to work with
+
+   job_cores = ProcSet((2, 5))  # let's use some cores for a job
+   free_cores -= job_cores
+
+   print('remaining cores:', str(free_cores))
+
+
+And it looks like this when run:
+
+.. code:: bash
+
+   $ python example.py
+   remaining cores: 0-1 6-7

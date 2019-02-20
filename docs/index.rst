@@ -39,6 +39,39 @@ Since it is mutable, it has no hash value and cannot be used as either a
 dictionary key or as an element of another set.
 
 
+Example use
+-----------
+
+You can get the library directly from PyPI:
+
+.. code:: bash
+
+   pip install procset
+
+
+What does it look like to use ``procset``?  Here is a simple example program:
+
+.. code:: python
+
+   from procset import ProcSet
+
+
+   free_cores = ProcSet((0, 7))  # I have 8 cores to work with
+
+   job_cores = ProcSet((2, 5))  # let's use some cores for a job
+   free_cores -= job_cores
+
+   print('remaining cores:', str(free_cores))
+
+
+And it looks like this when run:
+
+.. code:: bash
+
+   $ python example.py
+   remaining cores: 0-1 6-7
+
+
 .. string-representation_
 
 String representation of interval sets
