@@ -116,7 +116,7 @@ ProcSet API
       at the i-th position.
 
       When used with a :class:`slice`, ``pset[i:j:k]`` returns the
-      corresponding list of processors.
+      corresponding list of processors (see also :meth:`iter_slice`).
 
       >>> pset = ProcSet(ProcInt(0), ProcInt(2, 5), ProcInt(7, 13))
       >>> pset[0], pset[2], pset[-1]
@@ -132,6 +132,20 @@ ProcSet API
       >>> pset[3::-3]
       [4, 0]
 
+
+   .. automethod:: iter_slice
+
+      This method iterate over the same set of processors as
+      ``pset[start:stop:step]``.
+      In contrast to using ``[]``, we do not build the list of processors: the
+      memory complexity is hence constant rather than linear in the number of
+      iterated processors.
+
+      >>> pset = ProcSet(ProcInt(0), ProcInt(2, 5), ProcInt(7, 13))
+      >>> pset.iter_slice()
+      <generator object ProcSet.iter_slice at 0x7f0dd6afb8b8>
+      >>> list(pset.iter_slice())
+      [0, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13]
 
 
    .. automethod:: isdisjoint

@@ -21,6 +21,11 @@ This projects adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.ht
 Unreleased_
 ===========
 
+Added
+-----
+
+- :py:`ProcSet.iter_slice`, a constant memory iterator with slice semantic
+
 
 1.0rc1_ -- 2019-02-14
 =====================

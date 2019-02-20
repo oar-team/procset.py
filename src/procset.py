@@ -190,6 +190,36 @@ class ProcSet:
         for itv in reversed(self._itvs):
             yield from reversed(range(itv.inf, itv.sup + 1))
 
+    def iter_slice(self, start=None, stop=None, step=None):
+        """
+        Iterate over the processors in the ProcSet from *start* (included) to
+        *stop* (excluded) by steps of *step*.
+        """
+        cur, stop, step = slice(start, stop, step).indices(len(self))
+        if step > 0:
+            for itv in self._itvs:
+                if stop <= cur:  # early termination: no more matching items
+                    break
+                while cur < len(itv) and cur < stop:  # exhaust current itv
+                    yield itv.inf + cur
+                    cur += step
+                # switch to new itv
+                cur -= len(itv)
+                stop -= len(itv)
+        else:
+            # work from end when step is negative
+            cur -= len(self)
+            stop -= len(self)
+            for itv in reversed(self._itvs):
+                if stop >= cur:  # early termination: no more matching items
+                    break
+                # account for current itv shift
+                cur += len(itv)
+                stop += len(itv)
+                while cur >= 0 and cur > stop:  # exhaust current itv
+                    yield itv.inf + cur
+                    cur += step  # step is negative
+
     def __contains__(self, item):
         """Check if item is in the ProcSet."""
         if self._itvs:
@@ -581,40 +611,11 @@ class ProcSet:
                 cur += len(itv)
         raise IndexError('{} index out of range'.format(type(self).__name__))
 
-    def __getitem_slice(self, index):
-        assert isinstance(index, slice)
-        cur, stop, step = index.indices(len(self))
-        result = []
-        if step > 0:
-            for itv in self._itvs:
-                if stop <= cur:  # early termination: no more matching items
-                    break
-                while cur < len(itv) and cur < stop:  # exhaust current itv
-                    result.append(itv.inf + cur)
-                    cur += step
-                # switch to new itv
-                cur -= len(itv)
-                stop -= len(itv)
-        else:
-            # work from end when step is negative
-            cur -= len(self)
-            stop -= len(self)
-            for itv in reversed(self._itvs):
-                if stop >= cur:  # early termination: no more matching items
-                    break
-                # account for current itv shift
-                cur += len(itv)
-                stop += len(itv)
-                while cur >= 0 and cur > stop:  # exhaust current itv
-                    result.append(itv.inf + cur)
-                    cur += step  # step is negative
-        return result
-
     def __getitem__(self, index):
         if isinstance(index, int):
             return self.__getitem_int(index)
         if isinstance(index, slice):
-            return self.__getitem_slice(index)
+            return list(self.iter_slice(index.start, index.stop, index.step))
         raise TypeError(
             '{} indices must be integers or slices, not {}'.format(
                 type(self).__name__,
