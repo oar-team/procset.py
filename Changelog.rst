@@ -1,10 +1,3 @@
-.. custom role for python code
-
-.. role:: py(code)
-   :language: python
-
-.. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. .. ..
-
 =========
 Changelog
 =========
@@ -24,7 +17,7 @@ Unreleased_
 Added
 -----
 
-- :py:`ProcSet.iter_slice`, a constant memory iterator with slice semantic
+- ``ProcSet.iter_slice``, a constant memory iterator with slice semantic
 
 
 1.0rc1_ -- 2019-02-14
@@ -34,7 +27,7 @@ Added
 -----
 
 - Changelog
-- support of slices for :py:`ProcSet.__getitem__`
+- support of slices for ``ProcSet.__getitem__``
 
 
 Changed
@@ -50,44 +43,44 @@ Changed
 Added
 -----
 
-- [issue #3, MR !2] full support of set operations for :py:`ProcSet`:
-    - *operand methods* (:py:`|`, :py:`&`, :py:`-`, :py:`^`, :py:`|=`,
-      :py:`&=`, :py:`-=`, :py:`^=`) support set operation (immutable and
-      in-place) with :py:`ProcSet` objects only
-    - *plain-text methods* (:py:`.union(…)`, :py:`.intersection(…)`,
-      :py:`.difference(…)`, :py:`.symmetric_difference(…)`, :py:`.update(…)`,
-      :py:`.intersection_update(…)`, :py:`.difference_update(…)`,
-      :py:`.symmetric_difference_update(…)`) support set operations (both
+- [issue #3, MR !2] full support of set operations for ``ProcSet``:
+    - *operand methods* (``|``, ``&``, ``-``, ``^``, ``|=``, ``&=``, ``-=``,
+      ``^=``) support set operation (immutable and in-place) with ``ProcSet``
+      objects only
+    - *plain-text methods* (``.union(…)``, ``.intersection(…)``,
+      ``.difference(…)``, ``.symmetric_difference(…)``, ``.update(…)``,
+      ``.intersection_update(…)``, ``.difference_update(…)``,
+      ``.symmetric_difference_update(…)``) support set operations (both
       immutable and in-place) with any list of arguments that is a valid list
-      of arguments for :py:`ProcSet` initialization.
-      :py:`.symmetric_difference(…)` and :py:`.symmetric_difference_update(…)`
+      of arguments for ``ProcSet`` initialization.
+      ``.symmetric_difference(…)`` and ``.symmetric_difference_update(…)``
       support a single argument only.
 
-- full support of set comparison methods for :py:`ProcSet`:
-    - *operand methods* (:py:`<=`, :py:`<`, :py:`>=`, :py:`>`) support
-      comparisons with :py:`ProcSet` objects only
-    - *plain-text methods* (:py:`.isdisjoint(…)`, :py:`.issubset(…)`,
-      :py:`.issuperset(…)`) support comparison with any list of arguments that
-      is a valid list of arguments for :py:`ProcSet` initialization
+- full support of set comparison methods for ``ProcSet``:
+    - *operand methods* (``<=``, ``<``, ``>=``, ``>``) support comparisons with
+      ``ProcSet`` objects only
+    - *plain-text methods* (``.isdisjoint(…)``, ``.issubset(…)``,
+      ``.issuperset(…)``) support comparison with any list of arguments that is
+      a valid list of arguments for ``ProcSet`` initialization
 
-- support of index-based access with integers for :py:`ProcSet` (e.g., :py:`self[a]`),
-  slice objects (e.g., :py:`self[a:b:c]`) are not supported yet
+- support of index-based access with integers for ``ProcSet`` (e.g., ``self[a]``),
+  slice objects (e.g., ``self[a:b:c]``) are not supported yet
 
-- in-place emptying of a :py:`ProcSet` (:py:`.clear()`)
+- in-place emptying of a ``ProcSet`` (``.clear()``)
 
-- :py:`.discard(…)` as an alias for :py:`.difference_update(…)`
+- ``.discard(…)`` as an alias for ``.difference_update(…)``
 
 
 Changed
 -------
 
-- cleaned public imports of modules :py:`procset` and :py:`intsetwrap`
-- :py:`ProcInt` supports construction without specifying :py:`sup`:
-  :py:`ProcInt(0)` is the same as :py:`ProcInt(inf=0, sup=0)`
-- :py:`ProcSet` supports :py:`ProcSet` objects for its initialization
-- :py:`ProcSet.isdisjoint(…)` is more permissive with the :py:`other` argument,
+- cleaned public imports of modules ``procset`` and ``intsetwrap``
+- ``ProcInt`` supports construction without specifying ``sup``:
+  ``ProcInt(0)`` is the same as ``ProcInt(inf=0, sup=0)``
+- ``ProcSet`` supports ``ProcSet`` objects for its initialization
+- ``ProcSet.isdisjoint(…)`` is more permissive with the ``other`` argument,
   see the description of added features
-- :py:`ProcSet.insert(…)` is now an alias for :py:`.update(…)`: it is more
+- ``ProcSet.insert(…)`` is now an alias for ``.update(…)``: it is more
   permissive with its arguments, see the description of added features
 
 
@@ -97,7 +90,7 @@ Changed
 Added
 -----
 
-- implement :py:`.isdisjoint(…)` for :py:`ProcSet`
+- implement ``.isdisjoint(…)`` for ``ProcSet``
 
 
 0.3_ -- 2018-02-05
@@ -106,9 +99,9 @@ Added
 Changed
 -------
 
-- :py:`ProcSet`:
-    - [issue #7] rename :py:`.add(…)` into :py:`.insert(…)`
-    - optimize performances of :py:`.__deepcopy__(…)`
+- ``ProcSet``:
+    - [issue #7] rename ``.add(…)`` into ``.insert(…)``
+    - optimize performances of ``.__deepcopy__(…)``
 
 
 0.2_ -- 2018-01-31
@@ -117,9 +110,9 @@ Changed
 Added
 -----
 
-- [issue #2] support shallow and deep copy for both :py:`ProcInt` and :py:`ProcSet`
-  (see :py:`copy.copy` and :py:`copy.deepcopy`)
-- [issue #6] support :py:`repr` for :py:`ProcSet`
+- [issue #2] support shallow and deep copy for both ``ProcInt`` and ``ProcSet``
+  (see ``copy.copy`` and ``copy.deepcopy``)
+- [issue #6] support ``repr`` for ``ProcSet``
 
 
 0.1.dev5_ -- 2017-09-13
@@ -129,7 +122,7 @@ Fixed
 -----
 
 - fix license metadata of package
-- [issue #5] packaging of :py:`intsetwrap` module
+- [issue #5] packaging of ``intsetwrap`` module
 
 
 0.1.dev4_ -- 2017-09-11
@@ -153,14 +146,14 @@ Changed
 Added
 -----
 
-- [issue #4] basic support of in-place set-like operations for :py:`ProcSet`:
-  :py:`|=`, :py:`&=`, :py:`-=`, :py:`^=`
+- [issue #4] basic support of in-place set-like operations for ``ProcSet``:
+  ``|=``, ``&=``, ``-=``, ``^=``
 
 
 Fixed
 -----
 
-- :py:`.iscontiguous()` now returns :py:`True` for an empty :py:`ProcSet`
+- ``.iscontiguous()`` now returns ``True`` for an empty ``ProcSet``
 
 
 0.1.dev1_ -- 2017-03-28
@@ -169,13 +162,13 @@ Fixed
 Added
 -----
 
-- :py:`ProcSet`:
-    - membership testing (a.k.a., :py:`in`)
-    - iteration over the processors, in decreasing order (a.k.a. :py:`reversed(…)`)
-    - :py:`.min`, :py:`.max`, attributes for fast access to the extremal
+- ``ProcSet``:
+    - membership testing (a.k.a., ``in``)
+    - iteration over the processors, in decreasing order (a.k.a. ``reversed(…)``)
+    - ``.min``, ``.max``, attributes for fast access to the extremal
       processors
-    - :py:`.intervals()`, a method to iterate over the contiguous ranges of a
-      :py:`ProcSet`
+    - ``.intervals()``, a method to iterate over the contiguous ranges of a
+      ``ProcSet``
 
 
 0.1.dev0 -- 2017-03-22
@@ -184,27 +177,27 @@ Added
 Added
 -----
 
-- :py:`ProcInt`, a compact representation of a contiguous processor interval
+- ``ProcInt``, a compact representation of a contiguous processor interval
 
-- :py:`ProcSet`, a compact representation of processor intervals:
-    - parsing from (:py:`.from_str(…)`) / dumping to (:py:`str(…)`) a string
-      representation (e.g., :py:`'0-3 8-15'`)
-    - equality testing (:py:`==`)
-    - contiguity testing (:py:`.iscontiguous()`)
-    - number of processors (:py:`len(…)`)
-    - number of contiguous ranges (:py:`.count()`)
-    - iteration over the processors in increasing order (a.k.a. :py:`iter(…)`)
-    - convex hull (:py:`.aggregate()`)
-    - in-place insertion of processors (:py:`.add(…)`)
+- ``ProcSet``, a compact representation of processor intervals:
+    - parsing from (``.from_str(…)``) / dumping to (``str(…)``) a string
+      representation (e.g., ``'0-3 8-15'``)
+    - equality testing (``==``)
+    - contiguity testing (``.iscontiguous()``)
+    - number of processors (``len(…)``)
+    - number of contiguous ranges (``.count()``)
+    - iteration over the processors in increasing order (a.k.a. ``iter(…)``)
+    - convex hull (``.aggregate()``)
+    - in-place insertion of processors (``.add(…)``)
     - basic support of immutable set-like operations (returning the resulting
-      :py:`ProcSet` as a new object): :py:`|`, :py:`&`, :py:`-`, :py:`^`
+      ``ProcSet`` as a new object): ``|``, ``&``, ``-``, ``^``
 
 
 Deprecated
 ----------
 
-- :py:`intsetwrap` provides a drop-in replacement module for
-  :py:`interval_set`: it is guaranteed to stay until the first minor release of
+- ``intsetwrap`` provides a drop-in replacement module for
+  ``interval_set``: it is guaranteed to stay until the first minor release of
   the stable API (i.e., for ``procset<=1.0``)
 
 
