@@ -72,7 +72,7 @@ And it looks like this when run:
    remaining cores: 0-1 6-7
 
 
-.. string-representation_
+.. _string-representation:
 
 String representation of interval sets
 --------------------------------------

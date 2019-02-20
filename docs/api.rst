@@ -41,11 +41,15 @@ ProcSet API
          :meth:`from_str` only supports single character strings for ``insep``
          and ``outsep`` delimiters.
 
+      .. seealso::
+         :ref:`string-representation`
+
 
    .. describe:: str(pset)
                  format(pset[, format_spec])
 
-      Return the canonical string representation of *pset*.
+      Return the canonical :ref:`string representation <string-representation>`
+      of *pset*.
 
       When using :func:`str` or :func:`format` without *format_spec*, the
       default delimiters are used (default inner delimiter is ``-``, default
