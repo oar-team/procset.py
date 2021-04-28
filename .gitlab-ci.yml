@@ -12,6 +12,14 @@ before_script:
     reports:
       junit: pytest.xml
 
+pytest:3.9:
+  extends: .pytest
+  image: python:3.9-slim-buster
+
+pytest:3.8:
+  extends: .pytest
+  image: python:3.8-slim-buster
+
 pytest:3.7:
   extends: .pytest
   image: python:3.7-slim-stretch
